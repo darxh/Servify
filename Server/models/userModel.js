@@ -18,19 +18,19 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        "plese provide valid email",
+        "please provide valid email",
       ],
     },
     password: {
       type: String,
       required: [true, "Password is required"],
-      minLength: [5, "Password must be atleast 6 letters"],
+      minLength: [6, "Password must be atleast 6 letters"],
       select: false,
     },
     role: {
       type: String,
-      enum: ["user", "service-provider", "admin"],
-      default: user,
+      enum: ["user", "provider", "admin"],
+      default: "user",
     },
   },
   {
@@ -38,12 +38,13 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
+
+  return next();
 });
 
 userSchema.methods.comparePassword = async function (enteredPassword) {

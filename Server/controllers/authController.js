@@ -36,4 +36,4 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = registerUser;
+module.exports = { registerUser };

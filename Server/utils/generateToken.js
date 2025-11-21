@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 const generateToken = (res, userId) => {
-  const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_TOKEN, {
+
+  const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "15m",
   });
 
-  const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_TOKEN, {
+  const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: "7d",
   });
 
@@ -16,7 +17,7 @@ const generateToken = (res, userId) => {
     maxAge: 7 * 24 * 60 * 60 * 100,
   });
 
-  return generateToken;
+  return accessToken;
 };
 
 module.exports = generateToken;
