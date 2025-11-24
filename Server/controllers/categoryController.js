@@ -22,7 +22,7 @@ const createCategory = async (req, res) => {
     res.status(201).json(category);
   } catch (error) {
     res.status(500).json({
-      message: "error.message",
+      message: error.message,
     });
   }
 };
@@ -42,7 +42,9 @@ const getCategories = async (req, res) => {
 //delete category
 const deleteCategory = async (req, res) => {
   try {
-    const category = await Category.deleteOne(req.parmas.id);
+    const { id } = req.params;
+    
+    const category = await Category.deleteOne(id);
 
     if (category) {
       await Category.findOneAndDelete({ category });
@@ -52,7 +54,7 @@ const deleteCategory = async (req, res) => {
       res.status(404).json({ message: "category not found" });
     }
   } catch (error) {
-    res.status(501).status({
+    res.status(500).status({
       message: error.message,
     });
   }

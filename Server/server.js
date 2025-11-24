@@ -12,8 +12,18 @@ connectDB();
 
 const PORT = process.env.PORT || 8080;
 
+//middlewares
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+//routes
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/", testRoutes);
