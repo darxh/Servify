@@ -36,4 +36,27 @@ const registerUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser };
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (user && (await user.comparePassword(password))) {
+      const accessToken = generateToken(req, user._id);
+
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        accessToken: accessToken,
+      });
+    } else {
+      res.status(401).json({ message: "Invalide username or passowrd" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+module.exports = { registerUser, loginUser };
