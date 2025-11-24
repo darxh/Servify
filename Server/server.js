@@ -1,10 +1,11 @@
 require("dotenv").config();
+const cors = require("cors");
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const testRoutes = require("./routes/testRoutes");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 const app = express();
 connectDB();
@@ -14,6 +15,7 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/categories", categoryRoutes);
 app.use("/", testRoutes);
 
 app.listen(PORT, () => {
