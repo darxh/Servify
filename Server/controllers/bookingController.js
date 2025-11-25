@@ -41,4 +41,34 @@ const getMyBookings = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, getMyBookings };
+const UpdateBookingStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const booking = await Booking.findById(req.parmas._id);
+
+    if (!booking) {
+      res.status(404).json({
+        message: "Booking not found",
+      });
+    }
+
+    if (
+      booking.user.toString() !== req.user._id.toString() &&
+      booking.provider.toString() !== req.user._id.toString()
+    ) {
+      res.status(403).json({
+        message: "Not authorized to update this booking",
+      });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    res.json(booking);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+module.exports = { createBooking, getMyBookings, UpdateBookingStatus };
