@@ -29,6 +29,7 @@ app.use("/", testRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/services", serviceRoutes);
+
 app.listen(PORT, () => {
   console.log(`Server is running at: http://localhost:${PORT}`);
   Credentials: true;
