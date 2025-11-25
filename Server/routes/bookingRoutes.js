@@ -11,7 +11,7 @@ const { route } = require("./authRoutes");
 
 router.use(protect);
 
-route.post("/", createBooking);
+router.post("/", createBooking);
 router.get("/my-bookings", getMyBookings);
 router.put("/:id", UpdateBookingStatus);
 

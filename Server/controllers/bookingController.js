@@ -8,11 +8,11 @@ const createBooking = async (req, res) => {
     const service = await Service.findById(serviceId);
 
     if (!service) {
-      return res.status(500).json({ message: "service is not found" });
+      return res.status(404).json({ message: "service is not found" });
     }
 
     const booking = await Booking.create({
-      user: req.parmas._id,
+      user: req.user._id,
       provider: service.provider,
       service: service._id,
       amount: service.price,
@@ -31,9 +31,9 @@ const getMyBookings = async (req, res) => {
     const bookings = await Booking.find({
       $or: [{ user: req.user._id }, { provider: req.user._id }],
     })
-      .populate("service", "name service")
-      .populate("user", "name user")
-      .populate("provider", "name provider");
+      .populate("service", "name price")
+      .populate("user", "name email")
+      .populate("provider", "name");
 
     res.json(bookings);
   } catch (error) {
@@ -44,7 +44,7 @@ const getMyBookings = async (req, res) => {
 const UpdateBookingStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const booking = await Booking.findById(req.parmas._id);
+    const booking = await Booking.findById(req.params.id);
 
     if (!booking) {
       res.status(404).json({

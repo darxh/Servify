@@ -3,10 +3,13 @@ const cors = require("cors");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
+
+
 const testRoutes = require("./routes/testRoutes");
+const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const serviceRoutes = require("./routes/serviceRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 const app = express();
 connectDB();
@@ -25,10 +28,12 @@ app.use(
 );
 
 //routes
-app.use("/", testRoutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/services", serviceRoutes);
+app.use("/api/v1/bookings", bookingRoutes);
+
+app.use("/", testRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running at: http://localhost:${PORT}`);
