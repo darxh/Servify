@@ -6,6 +6,7 @@ const serviceSchema = new mongoose.Schema(
       type: String,
       required: [true, "Service name is required"],
       trim: true,
+      minlength: [3, "Name must be at least 3 characters"],
     },
     description: {
       type: String,
@@ -19,17 +20,18 @@ const serviceSchema = new mongoose.Schema(
     duration: {
       type: Number,
       required: [true, "Duration (in minutes) is required"],
+      min: [1, "Duration must be at least 1 minute"],
       default: 60,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      required: true,
+      required: [true, "Category is required"],
     },
     provider: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "Provider is required"],
     },
     image: {
       type: String,
