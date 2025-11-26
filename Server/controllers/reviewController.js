@@ -49,7 +49,32 @@ const getReviews = async (req, res) => {
   }
 };
 
+const deleteReview = async (req, res) => {
+  try {
+    const review = await Review.find(req.params.id);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    if (
+      review.user.toString() !== req.params._id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(401)
+        .json({ message: "You have already reviewed this service" });
+    }
+
+    await Review.deleteOne();
+    res.json({ message: "Review deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createReview,
   getReviews,
+  deleteReview,
 };
