@@ -53,7 +53,7 @@ const loginUser = async (req, res) => {
         accessToken: accessToken,
       });
     } else {
-      res.status(401).json({ message: "Invalide username or passowrd" });
+      res.status(401).json({ message: "Invalid username or password" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

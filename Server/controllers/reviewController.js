@@ -51,7 +51,7 @@ const getReviews = async (req, res) => {
 
 const deleteReview = async (req, res) => {
   try {
-    const review = await Review.find(req.params.id);
+    const review = await Review.findById(req.params.id);
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
@@ -63,10 +63,10 @@ const deleteReview = async (req, res) => {
     ) {
       return res
         .status(401)
-        .json({ message: "You have already reviewed this service" });
+        .json({ message: "Not authorized to delete this review" });
     }
 
-    await Review.deleteOne();
+    await review.deleteOne();
     res.json({ message: "Review deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
