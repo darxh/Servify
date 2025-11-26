@@ -11,6 +11,12 @@ const createBooking = async (req, res) => {
       return res.status(404).json({ message: "service is not found" });
     }
 
+    if (service.provider.toString() === req.user._id.toString()) {
+      return res
+        .status(400)
+        .json({ message: "You cannot book your own service" });
+    }
+
     const booking = await Booking.create({
       user: req.user._id,
       provider: service.provider,

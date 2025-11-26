@@ -60,3 +60,13 @@ const loginUser = async (req, res) => {
   }
 };
 module.exports = { registerUser, loginUser };
+
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
