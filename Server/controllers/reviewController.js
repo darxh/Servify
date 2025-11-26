@@ -58,7 +58,7 @@ const deleteReview = async (req, res) => {
     }
 
     if (
-      review.user.toString() !== req.params._id.toString() &&
+      review.user.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
     ) {
       return res
