@@ -16,7 +16,7 @@ const createReview = async (req, res) => {
       service: serviceId,
     });
 
-    if (!alreadyReviewed) {
+    if (alreadyReviewed) {
       return res
         .status(404)
         .json({ message: "You have already reviewed this service" });
