@@ -59,7 +59,6 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-module.exports = { registerUser, loginUser };
 
 const getMe = async (req, res) => {
   try {
@@ -70,3 +69,5 @@ const getMe = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+module.exports = { registerUser, loginUser, getMe };
