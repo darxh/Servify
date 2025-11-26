@@ -19,11 +19,11 @@ const bookingSchema = new mongoose.Schema(
     },
     bookingDate: {
       type: Date,
-      required: [true, "Booking datails required"],
+      required: [true, "Booking details required"],
     },
     address: {
       type: String,
-      required: [true, "Address datails required"],
+      required: [true, "Address details required"],
     },
     status: {
       type: String,
