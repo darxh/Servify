@@ -41,7 +41,6 @@ const getAllServices = async (req, res) => {
 };
 
 //get specific single service
-
 const getServiceById = async (req, res) => {
   try {
     const { id } = req.params;
