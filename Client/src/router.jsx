@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 const LoginPlaceholder = () => <h1 className="text-2xl">Login Page</h1>;
 const RegisterPlaceholder = () => <h1 className="text-2xl">Register Page</h1>;
 const DashboardPlaceholder = () => <h1 className="text-2xl">Dashboard Home</h1>;
+const SigupPlaceholder = () => <h1 className="text-2x1">SingUp</h1>;
 
 //Router Definition
 const router = createBrowserRouter([
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <RegisterPlaceholder />,
+      },
+      {
+        path: "signup",
+        element: <SigupPlaceholder />,
       },
     ],
   },
