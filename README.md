@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1> Servify</h1>
+  <h1>Servify</h1>
   
   <h3>The Modern Multi-Vendor Service Marketplace</h3>
 
@@ -11,15 +11,15 @@
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/MERN-Stack-000000?style=for-the-badge&logo=mongodb&logoColor=white" alt="MERN Stack" />
-    <img src="https://img.shields.io/badge/Status-In%20Development-yellow?style=for-the-badge" alt="Status" />
-    <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License" />
+    <img src="https://img.shields.io/badge/MERN-Stack-000000?style=flat&logo=mongodb&logoColor=white" alt="MERN Stack" />
+    <img src="https://img.shields.io/badge/Status-In%20Development-yellow?style=flat" alt="Status" />
+    <img src="https://img.shields.io/badge/License-MIT-blue?style=flat" alt="License" />
   </p>
 
   <p>
-    <a href="#-about-the-project">About</a> •
-    <a href="#-key-features">Key Features</a> •
-    <a href="#-tech-stack">Tech Stack</a>
+    <a href="#about-the-project">About</a> •
+    <a href="#key-features">Key Features</a> •
+    <a href="#tech-stack">Tech Stack</a>
   </p>
 </div>
 
@@ -33,26 +33,26 @@ Built to demonstrate scalable backend logic and a responsive modern frontend.
 
 ---
 
-##  Key Features
+## Key Features
 
-###  Authentication & Security
+### Authentication & Security
 * **JWT & Cookie Management:** Secure HttpOnly cookie implementation for session management.
 * **RBAC (Role-Based Access Control):** Strictly typed roles for `Admin`, `Provider`, and `Customer`.
 * **Data Protection:** Bcrypt hashing for passwords and sanitized API inputs.
 
-###  Marketplace Engine
+### Marketplace Engine
 * **Dynamic Listings:** Providers have full CRUD capabilities for their service portfolios.
 * **Smart Categorization:** Admin-managed taxonomy (e.g., Plumbing, Cleaning, Electrical).
-* **Booking Workflow:** State-machine logic for bookings (`Pending` → `Confirmed` → `Completed`).
+* **Booking Workflow:** State-machine logic for bookings (Pending → Confirmed → Completed).
 * **Conflict Prevention:** Self-booking restrictions and duplicate review prevention.
 
-###  Trust System
+### Trust System
 * **Verified Reviews:** Only customers with completed bookings can leave reviews.
 * **Rating Aggregation:** Real-time calculation of provider ratings.
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 | Domain | Technologies |
 | :--- | :--- |
@@ -65,5 +65,5 @@ Built to demonstrate scalable backend logic and a responsive modern frontend.
 ---
 
 <div align="center">
-  <sub>Active Development Phase • Updates Coming Soon</sub>
+  <sub>Active Development Phase</sub>
 </div>
