@@ -26,7 +26,7 @@
 
 <br />
 
-## 📖 About The Project
+## About The Project
 
 **Servify** is a professional-grade marketplace architecture designed to solve the fragmentation in local service bookings. It features a dual-interface system (Customer & Provider) with real-time status updates, robust security, and a seamless booking engine.
 
@@ -34,26 +34,26 @@ Built to demonstrate scalable backend logic and a responsive modern frontend.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 🔐 Authentication & Security
+### Authentication & Security
 * **JWT & Cookie Management:** Secure HttpOnly cookie implementation for session management.
 * **RBAC (Role-Based Access Control):** Strictly typed roles for `Admin`, `Provider`, and `Customer`.
 * **Data Protection:** Bcrypt hashing for passwords and sanitized API inputs.
 
-### 🏪 Marketplace Engine
+### Marketplace Engine
 * **Dynamic Listings:** Providers have full CRUD capabilities for their service portfolios.
 * **Smart Categorization:** Admin-managed taxonomy (e.g., Plumbing, Cleaning, Electrical).
 * **Booking Workflow:** State-machine logic for bookings (`Pending` → `Confirmed` → `Completed`).
 * **Conflict Prevention:** Self-booking restrictions and duplicate review prevention.
 
-### ⭐ Trust System
+### Trust System
 * **Verified Reviews:** Only customers with completed bookings can leave reviews.
 * **Rating Aggregation:** Real-time calculation of provider ratings.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Domain | Technologies |
 | :--- | :--- |
@@ -65,15 +65,3 @@ Built to demonstrate scalable backend logic and a responsive modern frontend.
 
 ---
 
-## 🏁 Getting Started
-
-Follow these steps to set up the project locally.
-
-### Prerequisites
-* Node.js (v16+)
-* MongoDB URI
-
-### 1. Clone the Repository
-```bash
-git clone [https://github.com/your-username/servify.git](https://github.com/your-username/servify.git)
-cd servify
