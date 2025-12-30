@@ -7,6 +7,7 @@ import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    {/* 2. Wrap the Router with AuthProvider */}
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
