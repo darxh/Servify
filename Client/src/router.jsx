@@ -1,9 +1,9 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
-import LoginPage from "./pages/auth/LoginPage"; // 1. Import the Real Page
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/RegisterPage"; // 1. Import the Register Page
 
-const RegisterPlaceholder = () => <h1 className="text-2xl">Register Page</h1>;
 const DashboardPlaceholder = () => <h1 className="text-2xl">Dashboard Home</h1>;
 
 const router = createBrowserRouter([
@@ -21,7 +21,7 @@ const router = createBrowserRouter([
       },
       {
         path: "register",
-        element: <RegisterPlaceholder />,
+        element: <RegisterPage />,
       },
     ],
   },
