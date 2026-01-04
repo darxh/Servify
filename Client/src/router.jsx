@@ -1,15 +1,16 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/auth/LoginPage";
-import RegisterPage from "./pages/auth/RegisterPage"; // 1. Import the Register Page
+import RegisterPage from "./pages/auth/RegisterPage";
+import HomePage from "./pages/home/HomePage";  
 
 const DashboardPlaceholder = () => <h1 className="text-2xl">Dashboard Home</h1>;
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/dashboard" replace />,
+    element: <HomePage />,
   },
   {
     path: "/auth",
