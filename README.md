@@ -31,6 +31,8 @@
 
 Built to demonstrate scalable backend logic and a responsive modern frontend.
 
+![Servify](https://github.com/darxh/Servify/blob/main/Client/src/assets/preview.png)
+
 ---
 
 ## Key Features
