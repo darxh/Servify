@@ -1,5 +1,6 @@
 import Hero from "../../features/home/components/Hero";
 import CategorySection from "../../features/home/components/CategorySection";
+import FeaturedServices from "../../features/home/components/FeaturedServices";
 import { Link } from "react-router-dom";
 
 const HomePage = () => {
@@ -31,6 +32,8 @@ const HomePage = () => {
         {/* The Navigation Map */}
         <CategorySection />
         
+        <FeaturedServices />
+
         {/* Placeholder for Future Sections */}
         <div className="py-24 text-center">
             <p className="text-gray-500">More sections (Featured Providers, Reviews) coming soon...</p>
