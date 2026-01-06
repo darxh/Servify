@@ -39,7 +39,7 @@ const HomePage = () => {
       
       {/* Footer */}
       <footer className="bg-gray-900 py-12 text-center text-white">
-          <p>&copy; 2024 Servify. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Servify. All rights reserved.</p>
       </footer>
     </div>
   );
