@@ -4,9 +4,10 @@ import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import HomePage from "./pages/home/HomePage";
-import ServiceDetailsPage from "./pages/services/ServiceDetailsPage"; // 1. Import the new page
+import ServiceDetailsPage from "./pages/services/ServiceDetailsPage"; 
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import MyServicesPage from "./pages/dashboard/MyServicesPage";
+import CreateServicePage from "./pages/dashboard/CreateServicePage";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "services", 
         element: <MyServicesPage />,
+      },
+      {
+        path: "services/new",
+        element: <CreateServicePage />,
       },
     ],
   },
