@@ -1,30 +1,22 @@
 import { Outlet } from "react-router-dom";
+import Sidebar from "./dashboard/Sidebar";
 
 const MainLayout = () => {
   return (
-    <div className="flex h-screen bg-gray-100">
-        
-      <aside className="hidden w-64 bg-white shadow-md md:flex md:flex-col">
-        <div className="flex h-16 items-center justify-center border-b px-4">
-          <h2 className="text-2xl font-bold text-blue-600">Servify</h2>
-        </div>
+    <div className="flex min-h-screen bg-gray-50">
 
-        <div className="flex-1 overflow-y-auto p-4">
-          <p className="text-sm text-gray-500">Navigation Placeholder</p>
-        </div>
-      </aside>
+      <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
+        <Sidebar />
+      </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 items-center justify-between bg-white px-6 shadow-sm">
-          <div className="text-lg font-semibold text-gray-700">Dashboard</div>
-
-          <div className="h-8 w-8 rounded-full bg-blue-100"></div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-6">
-          <Outlet />
+      <div className="flex flex-1 flex-col md:pl-64">
+        <main className="flex-1 py-10">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <Outlet />
+          </div>
         </main>
       </div>
+      
     </div>
   );
 };
