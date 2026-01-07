@@ -6,6 +6,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import ServiceDetailsPage from "./pages/services/ServiceDetailsPage"; // 1. Import the new page
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import MyServicesPage from "./pages/dashboard/MyServicesPage";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardPage />,
+      },
+      {
+        path: "services", 
+        element: <MyServicesPage />,
       },
     ],
   },
