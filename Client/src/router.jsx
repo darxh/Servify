@@ -5,8 +5,7 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import HomePage from "./pages/home/HomePage";
 import ServiceDetailsPage from "./pages/services/ServiceDetailsPage"; // 1. Import the new page
-
-const DashboardPlaceholder = () => <h1 className="text-2xl">Dashboard Home</h1>;
+import DashboardPage from "./pages/dashboard/DashboardPage";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +36,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <DashboardPlaceholder />,
+        element: <DashboardPage />,
       },
     ],
   },
