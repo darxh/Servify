@@ -10,9 +10,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
+        
+        if (!token) {
+          setIsLoading(false);
+          return;
+        }
+
         const { data } = await apiClient.get("/auth/me");
         setUser(data);
       } catch (error) {
+        localStorage.removeItem("accessToken");
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -24,10 +32,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const { data } = await apiClient.post("/auth/login", credentials);
+    
+    localStorage.setItem("accessToken", data.accessToken);
+    
     setUser(data);
   };
 
   const logout = async () => {
+    localStorage.removeItem("accessToken");
     setUser(null);
   };
 
