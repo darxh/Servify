@@ -1,36 +1,35 @@
 import { Link, useLocation } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Calendar,
-  Settings,
-  Briefcase,
-  LogOut,
-} from "lucide-react";
+import { LayoutDashboard, Calendar, Settings, Briefcase, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth(); 
 
-  const navigation = [
+  const baseNavigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "My Bookings", href: "/dashboard/bookings", icon: Calendar },
-    { name: "My Services", href: "/dashboard/services", icon: Briefcase }, // For Providers mainly
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
+
+  const providerNavigation = [
+    { name: "My Services", href: "/dashboard/services", icon: Briefcase },
+  ];
+
+  const navigation = (user?.role?.toLowerCase() === "provider" || user?.role === "admin")
+    ? [...baseNavigation.slice(0, 2), ...providerNavigation, ...baseNavigation.slice(2)] // Insert "My Services" in the middle
+    : baseNavigation;
 
   const isActive = (path) => pathname === path;
 
   return (
     <div className="flex h-full min-h-screen w-64 flex-col border-r border-gray-200 bg-white px-6">
-      {/* Logo Area */}
       <div className="flex h-16 items-center">
         <Link to="/" className="text-2xl font-bold text-blue-600">
           Servify
         </Link>
       </div>
 
-      {/* Navigation Links */}
       <nav className="flex flex-1 flex-col pt-4">
         <ul className="space-y-1">
           {navigation.map((item) => (
@@ -45,9 +44,7 @@ const Sidebar = () => {
               >
                 <item.icon
                   className={`h-5 w-5 shrink-0 ${
-                    isActive(item.href)
-                      ? "text-blue-600"
-                      : "text-gray-400 group-hover:text-blue-600"
+                    isActive(item.href) ? "text-blue-600" : "text-gray-400 group-hover:text-blue-600"
                   }`}
                   aria-hidden="true"
                 />
@@ -58,7 +55,6 @@ const Sidebar = () => {
         </ul>
       </nav>
 
-      {/* Footer / Logout */}
       <div className="mb-6 mt-auto border-t border-gray-200 pt-4">
         <button
           onClick={logout}
