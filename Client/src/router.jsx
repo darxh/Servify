@@ -4,10 +4,11 @@ import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import HomePage from "./pages/home/HomePage";
-import ServiceDetailsPage from "./pages/services/ServiceDetailsPage"; 
+import ServiceDetailsPage from "./pages/services/ServiceDetailsPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import MyServicesPage from "./pages/dashboard/MyServicesPage";
 import CreateServicePage from "./pages/dashboard/CreateServicePage";
+import MyBookingsPage from "./pages/dashboard/MyBookingsPage";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
     element: <HomePage />,
   },
   {
-    path: "/services/:id", 
+    path: "/services/:id",
     element: <ServiceDetailsPage />,
   },
   {
@@ -41,12 +42,16 @@ const router = createBrowserRouter([
         element: <DashboardPage />,
       },
       {
-        path: "services", 
+        path: "services",
         element: <MyServicesPage />,
       },
       {
         path: "services/new",
         element: <CreateServicePage />,
+      },
+      {
+        path: "bookings",
+        element: <MyBookingsPage />,
       },
     ],
   },
