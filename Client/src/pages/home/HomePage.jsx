@@ -26,7 +26,8 @@ const HomePage = () => {
                 to="/dashboard"
                 className="text-sm font-semibold leading-6 text-white hover:text-gray-300"
               >
-                Go to Dashboard <span aria-hidden="true">&rarr;</span>
+                {/* Go to Dashboard <span aria-hidden="true">&rarr;</span> */}
+                Go to Dashboard
               </Link>
             ) : (
               <>

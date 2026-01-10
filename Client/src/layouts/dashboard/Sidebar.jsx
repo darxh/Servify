@@ -1,5 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
-// 1. Add 'Home' icon to imports
+import { Link, useLocation } from "react-router-dom"; 
 import {
   LayoutDashboard,
   Calendar,
@@ -13,8 +12,7 @@ import { useAuth } from "../../context/AuthContext";
 const Sidebar = () => {
   const { pathname } = useLocation();
   const { logout, user } = useAuth();
-
-  // 2. Add 'Home' as the first item
+ 
   const baseNavigation = [
     { name: "Home", href: "/", icon: Home },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -25,14 +23,10 @@ const Sidebar = () => {
   const providerNavigation = [
     { name: "My Services", href: "/dashboard/services", icon: Briefcase },
   ];
-
-  // Logic to insert "My Services" for providers
+ 
   const navigation =
     user?.role?.toLowerCase() === "provider" || user?.role === "admin"
-      ? // Note: baseNavigation has 4 items now.
-        // Home(0), Dashboard(1), Bookings(2), Settings(3).
-        // We want 'My Services' after Bookings(2), or maybe after Dashboard(1).
-        // Let's put it after Dashboard for visibility:
+      ?
         [
           ...baseNavigation.slice(0, 2),
           ...providerNavigation,
@@ -45,7 +39,6 @@ const Sidebar = () => {
   return (
     <div className="flex h-full min-h-screen w-64 flex-col border-r border-gray-200 bg-white px-6">
       <div className="flex h-16 items-center">
-        {/* Keeping this logo link is fine too */}
         <Link to="/" className="text-2xl font-bold text-blue-600">
           Servify
         </Link>
