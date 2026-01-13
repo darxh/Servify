@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { useMyBookings } from "../../hooks/useMyBookings";
 import { useUpdateBooking } from "../../hooks/useUpdateBooking";
 import { useAuth } from "../../context/AuthContext";
-import { Calendar, MapPin, Clock, CheckCircle, XCircle, CheckCheck } from "lucide-react";  
+import { Calendar, MapPin, Clock, CheckCircle, XCircle, CheckCheck, Star } from "lucide-react";
+import ReviewModal from "../../features/reviews/components/ReviewModal";
 
 const MyBookingsPage = () => {
   const { user } = useAuth();
   const { data: bookings, isLoading, isError, error } = useMyBookings();
   
   const updateBookingMutation = useUpdateBooking();
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
 
   if (isLoading) {
     return <div>Loading your bookings...</div>;
@@ -19,6 +24,11 @@ const MyBookingsPage = () => {
 
   const handleStatusChange = (bookingId, newStatus) => {
     updateBookingMutation.mutate({ bookingId, status: newStatus });
+  };
+
+  const handleRateService = (serviceId) => {
+    setSelectedServiceId(serviceId);
+    setIsReviewModalOpen(true);
   };
 
   return (
@@ -46,7 +56,6 @@ const MyBookingsPage = () => {
                       </p>
                       
                       <div className="ml-2 flex flex-shrink-0 gap-2 items-center">
-                        {/* Status Badge */}
                         <p className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 
                           ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 
                             booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
@@ -75,6 +84,7 @@ const MyBookingsPage = () => {
                             </button>
                           </div>
                         )}
+
                         {isProvider && booking.status === 'confirmed' && (
                            <button
                              onClick={() => handleStatusChange(booking._id, "completed")}
@@ -85,9 +95,17 @@ const MyBookingsPage = () => {
                              <span>Mark Done</span>
                            </button>
                         )}
-                        
-                        {/* -------------------- */}
 
+                        {!isProvider && booking.status === 'completed' && (
+                           <button
+                             onClick={() => handleRateService(booking.service?._id)}
+                             className="ml-2 flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                           >
+                             <Star className="h-4 w-4 fill-white" />
+                             <span>Rate Service</span>
+                           </button>
+                        )}
+                        
                       </div>
                     </div>
                     
@@ -118,6 +136,12 @@ const MyBookingsPage = () => {
           </ul>
         </div>
       )}
+
+      <ReviewModal 
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        serviceId={selectedServiceId}
+      />
     </div>
   );
 };
