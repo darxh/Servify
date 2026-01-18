@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import apiClient from "../lib/axios";
 
-const fetchServices = async () => {
-  const { data } = await apiClient.get("/services");
-  
+const fetchServices = async (params) => {
+  const { data } = await apiClient.get("/services", { params });
   return data.services;
 };
 
-export const useServices = () => {
+export const useServices = (params) => {
   return useQuery({
-    queryKey: ["services"],
-    queryFn: fetchServices,
+    queryKey: ["services", params],
+    queryFn: () => fetchServices(params),
+    keepPreviousData: true,
   });
 };
