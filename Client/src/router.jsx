@@ -9,6 +9,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import MyServicesPage from "./pages/dashboard/MyServicesPage";
 import CreateServicePage from "./pages/dashboard/CreateServicePage";
 import MyBookingsPage from "./pages/dashboard/MyBookingsPage";
+import SettingsPage from "./pages/dashboard/SettingsPage";
 
 const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: "bookings",
         element: <MyBookingsPage />,
+      },
+      { 
+        path: "settings",
+        element: <SettingsPage /> 
       },
     ],
   },

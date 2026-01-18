@@ -2,11 +2,9 @@ import { Star, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useServices } from "../../../hooks/useServices";
 
-const FeaturedServices = () => {
-  // 1. Use the Hook
+const FeaturedServices = () => { 
   const { data: services, isLoading, isError, error } = useServices();
-
-  // 2. Loading State (The Spinner)
+ 
   if (isLoading) {
     return (
       <div className="flex h-64 items-center justify-center bg-white">
@@ -14,8 +12,7 @@ const FeaturedServices = () => {
       </div>
     );
   }
-
-  // 3. Error State (The Red Alert)
+ 
   if (isError) {
     return (
       <div className="bg-white py-12 text-center">
@@ -24,8 +21,7 @@ const FeaturedServices = () => {
       </div>
     );
   }
-
-  // 4. Empty State (No Data in DB)
+ 
   if (!services || services.length === 0) {
     return (
       <div className="bg-white py-12 text-center">
@@ -33,8 +29,7 @@ const FeaturedServices = () => {
       </div>
     );
   }
-
-  // 5. Success State (The Grid)
+ 
   return (
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -47,16 +42,13 @@ const FeaturedServices = () => {
           </p>
         </div>
 
-        {/* The Card Grid */}
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {services.slice(0, 3).map((service) => (
             <article key={service._id} className="flex flex-col items-start justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
-              
-              {/* Image Placeholder (Since we don't have real images yet) */}
+               
               <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
-                 {/* Try to use the service image, otherwise fallback */}
                 <img
-                  src={service.image || "https://images.unsplash.com/photo-1581578731117-104f2a863a30?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
+                  src={service.image || "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
                   alt={service.name}
                   className="absolute inset-0 h-full w-full object-cover"
                 />
