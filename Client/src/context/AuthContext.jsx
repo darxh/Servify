@@ -32,9 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const { data } = await apiClient.post("/auth/login", credentials);
-    
     localStorage.setItem("accessToken", data.accessToken);
-    
     setUser(data);
   };
 
@@ -43,12 +41,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (userData) => {
+    setUser((prev) => ({ ...prev, ...userData }));
+  };
+
   const value = {
     user,
     isLoading,
     isAuthenticated: !!user,
     login,
     logout,
+    updateUser,
   };
 
   return (
