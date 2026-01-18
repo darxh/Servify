@@ -58,4 +58,51 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-module.exports = { createCategory, getCategories, deleteCategory };
+//getall services
+const getAllServices = async (req, res) => {
+  try {
+    const { keyword, category, minPrice, maxPrice, sort } = req.query;
+
+    //Build the Search Query
+    const keywordFilter = keyword
+      ? {
+          $or: [
+            { name: { $regex: keyword, $options: "i" } },
+            { description: { $regex: keyword, $options: "i" } },
+          ],
+        }
+      : {};
+
+    //Build Category & Price Filters
+    const filters = { ...keywordFilter };
+
+    if (category) {
+      filters.category = category;
+    }
+
+    if (minPrice || maxPrice) {
+      filters.price = {};
+      if (minPrice) filters.price.$gte = Number(minPrice);
+      if (maxPrice) filters.price.$lte = Number(maxPrice);
+    }
+
+    // Handle Sorting
+    let sortOption = { createdAt: -1 };  
+    if (sort === "price-asc") {
+      sortOption = { price: 1 };  
+    } else if (sort === "price-desc") {
+      sortOption = { price: -1 };  
+    }
+
+    // Execute Query
+    const services = await Service.find(filters)
+      .populate("category", "name slug")
+      .populate("provider", "name email")
+      .sort(sortOption);
+
+    res.json({ count: services.length, services });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+module.exports = { createCategory, getCategories, deleteCategory, getAllServices, };
