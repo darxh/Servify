@@ -10,11 +10,16 @@ import MyServicesPage from "./pages/dashboard/MyServicesPage";
 import CreateServicePage from "./pages/dashboard/CreateServicePage";
 import MyBookingsPage from "./pages/dashboard/MyBookingsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import ServicesPage from "./pages/services/ServicesPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <HomePage />,
+  },
+  {
+    path: "/services",
+    element: <ServicesPage />,
   },
   {
     path: "/services/:id",
