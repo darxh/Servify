@@ -30,12 +30,51 @@ const createService = async (req, res) => {
 //getting all services
 const getAllServices = async (req, res) => {
   try {
-    const services = await Service.find({})
+    const { keyword, category, minPrice, maxPrice, sort } = req.query;
+-
+    console.log("--------------------------------");
+    console.log("Search Request Received:");
+    console.log("Keyword:", keyword);
+    console.log("Category:", category);
+
+    const keywordFilter = keyword
+      ? {
+          $or: [
+            { name: { $regex: keyword, $options: "i" } },
+            { description: { $regex: keyword, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const filters = { ...keywordFilter };
+
+    if (category) {
+      filters.category = category;
+    }
+
+    if (minPrice || maxPrice) {
+      filters.price = {};
+      if (minPrice) filters.price.$gte = Number(minPrice);
+      if (maxPrice) filters.price.$lte = Number(maxPrice);
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === "price-asc") {
+      sortOption = { price: 1 };
+    } else if (sort === "price-desc") {
+      sortOption = { price: -1 };
+    }
+
+    const services = await Service.find(filters)
       .populate("category", "name slug")
-      .populate("provider", "name email");
+      .populate("provider", "name email")
+      .sort(sortOption);
+
+    console.log(`Found ${services.length} services matching query.`);
 
     res.json({ count: services.length, services });
   } catch (error) {
+    console.error("Search Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
