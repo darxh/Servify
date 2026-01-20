@@ -1,7 +1,9 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query"; // <--- Import keepPreviousData
 import apiClient from "../lib/axios";
 
 const fetchServices = async (params) => {
+  console.log("Fetching services with params:", params);
+  
   const { data } = await apiClient.get("/services", { params });
   return data.services;
 };
