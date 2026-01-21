@@ -63,6 +63,10 @@ const router = createBrowserRouter([
         path: "settings",
         element: <SettingsPage /> 
       },
+      {
+        path: "services/edit/:id", 
+        element: <EditServicePage />,
+      },
     ],
   },
 ]);
