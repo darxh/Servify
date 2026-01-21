@@ -6,6 +6,8 @@ import { useAuth } from "../../context/AuthContext";
 
 const MyServicesPage = () => {
   const { user } = useAuth();
+  // Fetch all services. In a real app, you might want a specific endpoint like /services/my-services
+  // to avoid filtering on the client, but this works for now.
   const { data: services, isLoading } = useServices();
   const { mutate: deleteService } = useDeleteService();
 
@@ -107,13 +109,19 @@ const MyServicesPage = () => {
                         </span>
                       </td>
                       <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                        <button className="text-blue-600 hover:text-blue-900 mr-4">
+                        
+                        <Link
+                          to={`/dashboard/services/edit/${service._id}`}
+                          className="text-blue-600 hover:text-blue-900 mr-4 inline-block"
+                          title="Edit Service"
+                        >
                           <Pencil className="h-4 w-4" />
-                        </button>
+                        </Link>
 
                         <button
                           onClick={() => handleDelete(service._id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 inline-block"
+                          title="Delete Service"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
