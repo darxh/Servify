@@ -129,9 +129,38 @@ const deleteService = async (req, res) => {
   }
 };
 
+const updateService = async (req, res) => {
+  try {
+    const { name, description, price, duration, category } = req.body;
+
+    const service = await Service.findById(req.params.id);
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    if (service.provider.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(401).json({ message: "Not authorized to update this service" });
+    }
+
+    service.name = name || service.name;
+    service.description = description || service.description;
+    service.price = price || service.price;
+    service.duration = duration || service.duration;
+    service.category = category || service.category;
+
+    const updatedService = await service.save();
+    res.json(updatedService);
+    
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createService,
   getAllServices,
   getServiceById,
   deleteService,
+  updateService,
 };
