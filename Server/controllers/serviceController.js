@@ -31,11 +31,11 @@ const createService = async (req, res) => {
 const getAllServices = async (req, res) => {
   try {
     const { keyword, category, minPrice, maxPrice, sort } = req.query;
--
-    console.log("--------------------------------");
-    console.log("Search Request Received:");
-    console.log("Keyword:", keyword);
-    console.log("Category:", category);
+
+    // console.log("--------------------------------");
+    // console.log("Search Request Received:");
+    // console.log("Keyword:", keyword);
+    // console.log("Category:", category);
 
     const keywordFilter = keyword
       ? {
