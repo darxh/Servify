@@ -11,6 +11,7 @@ import CreateServicePage from "./pages/dashboard/CreateServicePage";
 import MyBookingsPage from "./pages/dashboard/MyBookingsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import ServicesPage from "./pages/services/ServicesPage";
+import EditServicePage from "./pages/dashboard/EditServicePage";
 
 const router = createBrowserRouter([
   {

@@ -34,7 +34,7 @@ const serviceSchema = new mongoose.Schema(
       required: [true, "Provider is required"],
     },
     image: {
-      type: String,
+      type: [String],
       default:
         "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       required: true,
