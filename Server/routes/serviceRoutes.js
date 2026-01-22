@@ -10,11 +10,12 @@ const {
 } = require("../controllers/serviceController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
+const upload = require("../config/cloudinary");
 
 router.get("/", getAllServices);
 router.get("/:id", getServiceById);
-router.post("/", protect, authorize("provider", "admin"), createService);
-router.put("/:id", protect, authorize("provider", "admin"), updateService);
+router.post("/", protect, authorize("provider", "admin"), upload.array("images", 5), createService);
+router.put("/:id", protect, authorize("provider", "admin"), upload.array("images", 5), updateService);
 router.delete("/:id", protect, authorize("provider", "admin"), deleteService);
 
 module.exports = router;

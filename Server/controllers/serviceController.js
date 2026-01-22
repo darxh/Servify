@@ -1,14 +1,20 @@
 const Service = require("../models/serviceModel");
 const Category = require("../models/categoryModel");
 
-//creating new service
+// @desc    Create new service
+// @route   POST /api/v1/services
+// @access  Private (Provider)
 const createService = async (req, res) => {
   try {
     const { name, description, price, duration, category } = req.body;
+    let imagePaths = [];
+    if (req.files && req.files.length > 0) {
+      imagePaths = req.files.map((file) => file.path);
+    }
 
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
-      return res.status(500).json({ message: "Invalid category Id" });
+      return res.status(400).json({ message: "Invalid category Id" });
     }
 
     const service = await Service.create({
@@ -19,6 +25,7 @@ const createService = async (req, res) => {
       description,
       price,
       duration,
+      images: imagePaths.length > 0 ? imagePaths : undefined, 
     });
 
     res.status(201).json(service);
@@ -27,15 +34,12 @@ const createService = async (req, res) => {
   }
 };
 
-//getting all services
+// @desc    Get all services (with Search & Filter)
+// @route   GET /api/v1/services
+// @access  Public
 const getAllServices = async (req, res) => {
   try {
     const { keyword, category, minPrice, maxPrice, sort } = req.query;
-
-    // console.log("--------------------------------");
-    // console.log("Search Request Received:");
-    // console.log("Keyword:", keyword);
-    // console.log("Category:", category);
 
     const keywordFilter = keyword
       ? {
@@ -70,65 +74,37 @@ const getAllServices = async (req, res) => {
       .populate("provider", "name email")
       .sort(sortOption);
 
-    console.log(`Found ${services.length} services matching query.`);
-
     res.json({ count: services.length, services });
   } catch (error) {
-    console.error("Search Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
-//get specific single service
+// @desc    Get single service
+// @route   GET /api/v1/services/:id
+// @access  Public
 const getServiceById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const service = await Service.findById(id)
+    const service = await Service.findById(req.params.id)
       .populate("category", "name")
-      .populate("provider", "name email");
-
-    if (!service) {
-      return res.status(404).json({
-        message: "Service not found",
+      .populate("provider", "name email")
+      .populate({
+        path: "reviews",
+        populate: { path: "user", select: "name" }
       });
-    }
-    res.json(service);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-const deleteService = async (req, res) => {
-  try {
-    const service = await Service.findById(req.params.id);
 
     if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
-
-    if (
-      service.provider.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    ) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized to delete this service" });
-    }
-
-    await service.deleteOne();
-
-    res.json({
-      message: "service removed",
-    });
+    res.json(service);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
+// @desc    Update a service
+// @route   PUT /api/v1/services/:id
+// @access  Private (Provider)
 const updateService = async (req, res) => {
   try {
     const { name, description, price, duration, category } = req.body;
@@ -140,7 +116,7 @@ const updateService = async (req, res) => {
     }
 
     if (service.provider.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      return res.status(401).json({ message: "Not authorized to update this service" });
+      return res.status(401).json({ message: "Not authorized" });
     }
 
     service.name = name || service.name;
@@ -148,6 +124,11 @@ const updateService = async (req, res) => {
     service.price = price || service.price;
     service.duration = duration || service.duration;
     service.category = category || service.category;
+
+    if (req.files && req.files.length > 0) {
+      const newImages = req.files.map((file) => file.path);
+      service.images = newImages;
+    }
 
     const updatedService = await service.save();
     res.json(updatedService);
@@ -157,10 +138,32 @@ const updateService = async (req, res) => {
   }
 };
 
+// @desc    Delete a service
+// @route   DELETE /api/v1/services/:id
+// @access  Private (Provider)
+const deleteService = async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    if (service.provider.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    await service.deleteOne();
+    res.json({ message: "Service removed" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createService,
   getAllServices,
   getServiceById,
-  deleteService,
   updateService,
+  deleteService,
 };
