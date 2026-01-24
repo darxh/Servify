@@ -129,6 +129,29 @@ Follow these steps to set up the project locally.
 
 Open your browser and navigate to `http://localhost:5173`.
 
+
+## Project Structure
+
+```bash
+Servify/
+├── Client/                 # React 19 Frontend
+│   ├── src/
+│   │   ├── features/       # Feature-based architecture (Auth, Bookings, Home)
+│   │   ├── hooks/          # Custom Hooks (useCreateBooking, useService, etc.)
+│   │   ├── pages/          # Route components
+│   │   ├── context/        # Global Auth Context
+│   │   └── lib/            # Axios setup & Utils
+│   └── ...
+├── Server/                 # Node.js Backend
+│   ├── config/             # DB & Cloudinary Config
+│   ├── controllers/        # Route Logic
+│   ├── models/             # Mongoose Schemas (User, Service, Booking, Review)
+│   ├── routes/             # API Endpoints
+│   ├── middleware/         # Auth & Error handling
+│   └── ...
+
+```
+
 ---
 
 <div align="center">
