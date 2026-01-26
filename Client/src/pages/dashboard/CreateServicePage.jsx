@@ -7,27 +7,25 @@ import { Upload, X, Loader2 } from "lucide-react";
 
 const CreateServicePage = () => {
   const navigate = useNavigate();
-  const [previews, setPreviews] = useState([]);
+  const [preview, setPreview] = useState(null); 
   
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
   const createServiceMutation = useCreateService();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
 
-  const selectedFiles = watch("images");
+  const selectedFile = watch("image"); 
 
   useEffect(() => {
-    if (selectedFiles && selectedFiles.length > 0) {
-      const newPreviews = [];
-      for (let i = 0; i < selectedFiles.length; i++) {
-        newPreviews.push(URL.createObjectURL(selectedFiles[i]));
-      }
-      setPreviews(newPreviews);
+    if (selectedFile && selectedFile.length > 0) {
+      const file = selectedFile[0];
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
 
-      return () => {
-        newPreviews.forEach((url) => URL.revokeObjectURL(url));
-      };
+      return () => URL.revokeObjectURL(objectUrl);
+    } else {
+      setPreview(null);
     }
-  }, [selectedFiles]);
+  }, [selectedFile]);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -37,14 +35,8 @@ const CreateServicePage = () => {
     formData.append("duration", data.duration);
     formData.append("category", data.category);
 
-    if (data.images && data.images.length > 0) {
-      if (data.images.length > 5) {
-        alert("You can only upload up to 5 images");
-        return;
-      }
-      for (let i = 0; i < data.images.length; i++) {
-        formData.append("images", data.images[i]);
-      }
+    if (data.image && data.image.length > 0) {
+      formData.append("image", data.image[0]); 
     }
 
     createServiceMutation.mutate(formData, {
@@ -127,9 +119,9 @@ const CreateServicePage = () => {
           />
         </div>
 
-        {/* --- FIXED FILE UPLOAD WITH PREVIEW --- */}
+        {/* single file upload*/}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Service Images (Max 5)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Service Image</label>
           
           <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors relative">
             <div className="space-y-1 text-center">
@@ -139,14 +131,13 @@ const CreateServicePage = () => {
                   htmlFor="file-upload"
                   className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
                 >
-                  <span>Upload files</span>
+                  <span>Upload file</span>
                   <input
                     id="file-upload"
                     type="file"
-                    multiple
                     accept="image/*"
                     className="sr-only"
-                    {...register("images")}
+                    {...register("image")} 
                   />
                 </label>
               </div>
@@ -154,31 +145,26 @@ const CreateServicePage = () => {
             </div>
           </div>
 
-          {/* --- PREVIEW GRID --- */}
-          {previews.length > 0 && (
-            <div className="mt-4 grid grid-cols-3 sm:grid-cols-5 gap-4">
-              {previews.map((src, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={src}
-                    alt={`Preview ${index}`}
-                    className="h-24 w-full object-cover rounded-lg border border-gray-200"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                        setValue("images", null);
-                    }}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
+          {/* preview */}
+          {preview && (
+            <div className="mt-4 relative w-32 h-32">
+              <img
+                src={preview}
+                alt="Preview"
+                className="h-full w-full object-cover rounded-lg border border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                    setValue("image", null);
+                }}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           )}
         </div>
-        {/* -------------------------------------- */}
 
         <div className="pt-4 flex justify-end">
           <button

@@ -5,11 +5,15 @@ const Category = require("../models/categoryModel");
 // @route   POST /api/v1/services
 // @access  Private (Provider)
 const createService = async (req, res) => {
+
+  // console.log("Create Service Request Body:", req.body);
+  // console.log("Create Service Request File:", req.file);
+
   try {
     const { name, description, price, duration, category } = req.body;
-    let imagePaths = [];
-    if (req.files && req.files.length > 0) {
-      imagePaths = req.files.map((file) => file.path);
+    let imagePath;
+    if (req.file) {
+      imagePath = req.file.path;
     }
 
     const categoryExists = await Category.findById(category);
@@ -25,7 +29,7 @@ const createService = async (req, res) => {
       description,
       price,
       duration,
-      images: imagePaths.length > 0 ? imagePaths : undefined, 
+      image: imagePath,
     });
 
     res.status(201).json(service);
@@ -43,11 +47,11 @@ const getAllServices = async (req, res) => {
 
     const keywordFilter = keyword
       ? {
-          $or: [
-            { name: { $regex: keyword, $options: "i" } },
-            { description: { $regex: keyword, $options: "i" } },
-          ],
-        }
+        $or: [
+          { name: { $regex: keyword, $options: "i" } },
+          { description: { $regex: keyword, $options: "i" } },
+        ],
+      }
       : {};
 
     const filters = { ...keywordFilter };
@@ -108,12 +112,9 @@ const getServiceById = async (req, res) => {
 const updateService = async (req, res) => {
   try {
     const { name, description, price, duration, category } = req.body;
-
     const service = await Service.findById(req.params.id);
 
-    if (!service) {
-      return res.status(404).json({ message: "Service not found" });
-    }
+    if (!service) return res.status(404).json({ message: "Service not found" });
 
     if (service.provider.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(401).json({ message: "Not authorized" });
@@ -125,9 +126,8 @@ const updateService = async (req, res) => {
     service.duration = duration || service.duration;
     service.category = category || service.category;
 
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => file.path);
-      service.images = newImages;
+    if (req.file) {
+      service.image = req.file.path;
     }
 
     const updatedService = await service.save();

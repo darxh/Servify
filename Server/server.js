@@ -36,6 +36,15 @@ app.use("/api/v1/reviews", reviewRoutes);
 
 app.use("/", testRoutes);
 
+app.use((err, req, res, next) => {
+  console.log("--------------------------------");
+  console.log("GLOBAL ERROR CAUGHT:");
+  console.log(err.stack);
+  console.log("Error Details:", JSON.stringify(err, null, 2));
+  console.log("--------------------------------");
+  res.status(500).json({ message: err.message, error: err });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running at: http://localhost:${PORT}`);
 });
