@@ -45,10 +45,15 @@ const FeaturedServices = () => {
         <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
           {services.slice(0, 3).map((service) => (
             <article key={service._id} className="flex flex-col items-start justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
-               
+                
               <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
                 <img
-                  src={service.image || "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
+                  src={
+                    (service.images && service.images.length > 0) 
+                      ? service.images[0] 
+                      : (service.image || "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+                    // ---------------------------------------------
+                  }
                   alt={service.name}
                   className="absolute inset-0 h-full w-full object-cover"
                 />
@@ -60,7 +65,7 @@ const FeaturedServices = () => {
               <div className="max-w-xl">
                 <div className="mt-4 flex items-center gap-x-4 text-xs">
                   <span className="relative z-10 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-600">
-                  {service.category.name}
+                    {service.category?.name || "General"}
                   </span>
                   <div className="flex items-center gap-x-1 text-yellow-500">
                     <Star className="h-4 w-4 fill-current" />
