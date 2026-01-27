@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role:safeRole,
+      role: safeRole,
     });
 
     if (user) {
