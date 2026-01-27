@@ -3,29 +3,32 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useCreateService } from "../../hooks/useCreateService";
 import { useCategories } from "../../hooks/useCategories";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2,Image as ImageIcon } from "lucide-react";
 
 const CreateServicePage = () => {
   const navigate = useNavigate();
-  const [preview, setPreview] = useState(null); 
-  
+  const [previews, setPreviews] = useState([]);
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm();
   const createServiceMutation = useCreateService();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
 
-  const selectedFile = watch("image"); 
+  const selectedFiles = watch("images");
 
   useEffect(() => {
-    if (selectedFile && selectedFile.length > 0) {
-      const file = selectedFile[0];
-      const objectUrl = URL.createObjectURL(file);
-      setPreview(objectUrl);
+    if (selectedFiles && selectedFiles.length > 0) {
+      const newPreviews = Array.from(selectedFiles).map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPreviews(newPreviews);
 
-      return () => URL.revokeObjectURL(objectUrl);
+      return () => {
+        newPreviews.forEach((url) => URL.revokeObjectURL(url));
+      };
     } else {
-      setPreview(null);
+      setPreviews([]);
     }
-  }, [selectedFile]);
+  }, [selectedFiles]);
 
   const onSubmit = (data) => {
     const formData = new FormData();
@@ -35,8 +38,10 @@ const CreateServicePage = () => {
     formData.append("duration", data.duration);
     formData.append("category", data.category);
 
-    if (data.image && data.image.length > 0) {
-      formData.append("image", data.image[0]); 
+    if (data.images && data.images.length > 0) {
+      Array.from(data.images).forEach((file) => {
+        formData.append("images", file); 
+      });
     }
 
     createServiceMutation.mutate(formData, {
@@ -53,9 +58,9 @@ const CreateServicePage = () => {
   return (
     <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow border border-gray-200">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Service</h1>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        
+
         {/* Name */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Service Name</label>
@@ -119,49 +124,50 @@ const CreateServicePage = () => {
           />
         </div>
 
-        {/* single file upload*/}
+        {/* file upload section*/}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Service Image</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Service Images (Max 5)</label>
           
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors relative">
+          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:bg-gray-50 transition-colors relative">
             <div className="space-y-1 text-center">
               <Upload className="mx-auto h-12 w-12 text-gray-400" />
               <div className="flex text-sm text-gray-600 justify-center">
                 <label
                   htmlFor="file-upload"
-                  className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                  className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                 >
-                  <span>Upload file</span>
+                  <span>Upload images</span>
                   <input
                     id="file-upload"
                     type="file"
+                    multiple
                     accept="image/*"
                     className="sr-only"
-                    {...register("image")} 
+                    {...register("images")}
                   />
                 </label>
+                <p className="pl-1">or drag and drop</p>
               </div>
-              <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+              <p className="text-xs text-gray-500">PNG, JPG, WEBP up to 5MB each</p>
             </div>
           </div>
 
-          {/* preview */}
-          {preview && (
-            <div className="mt-4 relative w-32 h-32">
-              <img
-                src={preview}
-                alt="Preview"
-                className="h-full w-full object-cover rounded-lg border border-gray-200"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                    setValue("image", null);
-                }}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5"
-              >
-                <X className="h-4 w-4" />
-              </button>
+          {/* [CHANGE] Grid Preview for Multiple Images */}
+          {previews.length > 0 && (
+            <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {previews.map((url, index) => (
+                <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                  <img
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="h-full w-full object-cover"
+                  />
+                  {/* Optional: Add remove button logic later if needed */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <ImageIcon className="text-white h-6 w-6" />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

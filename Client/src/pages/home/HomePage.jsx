@@ -2,7 +2,7 @@ import Hero from "../../features/home/components/Hero";
 import CategorySection from "../../features/home/components/CategorySection";
 import FeaturedServices from "../../features/home/components/FeaturedServices";
 import HowItWorks from "../../features/home/components/HowItWorks";
-import Footer from "../../features/home/components/Footer"; // [NEW] Import Footer
+import Footer from "../../features/home/components/Footer";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { LayoutDashboard, LogIn, UserPlus } from "lucide-react";

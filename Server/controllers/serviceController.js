@@ -12,9 +12,10 @@ const createService = async (req, res) => {
 
   try {
     const { name, description, price, duration, category } = req.body;
-    let imagePath;
-    if (req.file) {
-      imagePath = req.file.path;
+
+    let imagePaths = [];
+    if (req.files && req.files.length > 0) {
+      imagePaths = req.files.map((file) => file.path);
     }
 
     const categoryExists = await Category.findById(category);
@@ -30,7 +31,7 @@ const createService = async (req, res) => {
       description,
       price,
       duration,
-      image: imagePath,
+      images: imagePaths,
     });
 
     res.status(201).json(service);
@@ -127,8 +128,8 @@ const updateService = async (req, res) => {
     service.duration = duration || service.duration;
     service.category = category || service.category;
 
-    if (req.file) {
-      service.image = req.file.path;
+    if (req.files && req.files.length > 0) {
+      service.images = req.files.map((file) => file.path);
     }
 
     const updatedService = await service.save();
@@ -160,8 +161,8 @@ const deleteService = async (req, res) => {
     });
 
     if (activeBookings > 0) {
-      return res.status(400).json({ 
-        message: `Cannot delete service. There are ${activeBookings} active bookings for this service. Please cancel them first.` 
+      return res.status(400).json({
+        message: `Cannot delete service. There are ${activeBookings} active bookings for this service. Please cancel them first.`
       });
     }
 
