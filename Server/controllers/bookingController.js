@@ -5,6 +5,16 @@ const Service = require("../models/serviceModel");
 const createBooking = async (req, res) => {
   try {
     const { serviceId, bookingDate, address } = req.body;
+
+    const today = new Date().toISOString().split("T")[0];
+
+    if (bookingDate < today) {
+      return res.status(400).json({
+        message: "You cannot book services for past dates."
+      });
+    }
+
+
     const service = await Service.findById(serviceId);
 
     if (!service) {
@@ -20,7 +30,7 @@ const createBooking = async (req, res) => {
 
     // avalibilty checking
     const newStartTime = new Date(bookingDate);
-    const newEndTime = new Date(newStartTime.getTime() + service.duration * 60000); \
+    const newEndTime = new Date(newStartTime.getTime() + service.duration * 60000);
 
     const existingBookings = await Booking.find({
       provider: service.provider,
