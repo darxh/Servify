@@ -1,16 +1,30 @@
 const Review = require("../models/reviewModel");
 const Service = require("../models/serviceModel");
+const Booking = require("../models/bookingModel"); // [EXPLAIN] We need this to verify purchase
 
 const createReview = async (req, res) => {
   try {
     const { rating, comment, serviceId } = req.body;
 
+    // Check if Service exists
     const service = await Service.findById(serviceId);
-
     if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
 
+    const hasBooking = await Booking.findOne({
+      user: req.user._id,
+      service: serviceId,
+      status: "completed",
+    });
+
+    if (!hasBooking) {
+      return res.status(403).json({ 
+        message: "You can only review services you have booked and completed." 
+      });
+    }
+
+    // Prevent spamming
     const alreadyReviewed = await Review.findOne({
       user: req.user._id,
       service: serviceId,
@@ -18,10 +32,11 @@ const createReview = async (req, res) => {
 
     if (alreadyReviewed) {
       return res
-        .status(404)
+        .status(400) 
         .json({ message: "You have already reviewed this service" });
     }
 
+    // Create the Review
     const review = await Review.create({
       user: req.user._id,
       service: serviceId,
@@ -56,7 +71,7 @@ const deleteReview = async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
-
+ 
     if (
       review.user.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
