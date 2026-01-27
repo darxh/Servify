@@ -10,12 +10,16 @@ const registerUser = async (req, res) => {
     if (userExists) {
       return res.status(400).json({ message: "user already exists" });
     }
+    let safeRole = "user";
+    if (role === "provider") {
+      safeRole = "provider";
+    }
 
     const user = await User.create({
       name,
       email,
       password,
-      role,
+      role:safeRole,
     });
 
     if (user) {
