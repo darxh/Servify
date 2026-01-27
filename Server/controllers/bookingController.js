@@ -1,4 +1,3 @@
-// Server/controllers/bookingController.js
 const Booking = require("../models/bookingModel");
 const Service = require("../models/serviceModel");
 

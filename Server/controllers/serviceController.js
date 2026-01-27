@@ -1,5 +1,6 @@
 const Service = require("../models/serviceModel");
 const Category = require("../models/categoryModel");
+const Booking = require("../models/bookingModel");
 
 // @desc    Create new service
 // @route   POST /api/v1/services
@@ -132,7 +133,7 @@ const updateService = async (req, res) => {
 
     const updatedService = await service.save();
     res.json(updatedService);
-    
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -151,6 +152,17 @@ const deleteService = async (req, res) => {
 
     if (service.provider.toString() !== req.user._id.toString() && req.user.role !== "admin") {
       return res.status(401).json({ message: "Not authorized" });
+    }
+
+    const activeBookings = await Booking.countDocuments({
+      service: service._id,
+      status: { $in: ["pending", "confirmed"] }
+    });
+
+    if (activeBookings > 0) {
+      return res.status(400).json({ 
+        message: `Cannot delete service. There are ${activeBookings} active bookings for this service. Please cancel them first.` 
+      });
     }
 
     await service.deleteOne();
