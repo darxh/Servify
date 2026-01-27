@@ -1,46 +1,52 @@
 import Hero from "../../features/home/components/Hero";
 import CategorySection from "../../features/home/components/CategorySection";
 import FeaturedServices from "../../features/home/components/FeaturedServices";
+import HowItWorks from "../../features/home/components/HowItWorks";
+import Footer from "../../features/home/components/Footer"; // [NEW] Import Footer
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { LayoutDashboard, LogIn, UserPlus } from "lucide-react";
 
 const HomePage = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="bg-white">
+    <div className="bg-white min-h-screen flex flex-col font-sans">
+       
       <header className="absolute inset-x-0 top-0 z-50">
-        <nav
-          className="flex items-center justify-between p-6 lg:px-8"
-          aria-label="Global"
-        >
+        <nav className="max-w-7xl mx-auto flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+          
+          {/* Logo Section */}
           <div className="flex lg:flex-1">
-            <Link to="/" className="-m-1.5 p-1.5 text-2xl font-bold text-white">
-              Servify
+            <Link to="/" className="-m-1.5 p-1.5 flex items-center gap-2 group">
+              <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">Servify</span>
             </Link>
           </div>
 
-          <div className="flex flex-1 justify-end gap-x-6">
+          {/* Navigation / Auth Buttons */}
+          <div className="flex flex-1 justify-end gap-x-4">
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
-                className="text-sm font-semibold leading-6 text-white hover:text-gray-300"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
               >
-                {/* Go to Dashboard <span aria-hidden="true">&rarr;</span> */}
+                <LayoutDashboard size={18} />
                 Go to Dashboard
               </Link>
             ) : (
               <>
                 <Link
                   to="/auth/login"
-                  className="text-sm font-semibold leading-6 text-white hover:text-gray-300"
+                  className="hidden md:flex items-center gap-2 text-sm font-semibold leading-6 text-white hover:text-blue-200 transition-colors px-4 py-2"
                 >
-                  Log in <span aria-hidden="true">&rarr;</span>
+                  <LogIn size={18} />
+                  Log in
                 </Link>
                 <Link
                   to="/auth/register"
-                  className="text-sm font-semibold leading-6 text-white hover:text-gray-300"
+                  className="flex items-center gap-2 bg-white text-blue-900 hover:bg-gray-100 px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg transform hover:-translate-y-0.5"
                 >
+                  <UserPlus size={18} />
                   Sign up
                 </Link>
               </>
@@ -49,20 +55,47 @@ const HomePage = () => {
         </nav>
       </header>
 
-      <main>
+      <main className="flex-grow">
+        
+        {/* Hero */}
         <Hero />
+        
+        {/* Categories */}
         <CategorySection />
+        
+        {/* How It Works section */}
+        <HowItWorks />
+        
+        {/* Featured Services */}
         <FeaturedServices />
-        <div className="py-24 text-center">
-          <p className="text-gray-500">
-            More sections (Featured Providers, Reviews) coming soon...
-          </p>
+        
+        {/* Final CTA Section*/}
+        <div className="bg-gradient-to-br from-blue-900 to-gray-900 py-20 relative overflow-hidden">
+
+           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl"></div>
+           
+           <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              Ready to simplify your life?
+            </h2>
+            <p className="text-blue-100 mb-10 text-lg max-w-2xl mx-auto">
+              Join thousands of people who trust Servify for their daily needs. 
+              Secure, fast, and professional.
+            </p>
+            {!isAuthenticated && (
+              <Link 
+                to="/auth/register"
+                className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-500 transition-all shadow-xl hover:shadow-blue-600/20"
+              >
+                Get Started for Free
+              </Link>
+            )}
+          </div>
         </div>
       </main>
 
-      <footer className="bg-gray-900 py-12 text-center text-white">
-        <p>© {new Date().getFullYear()} Servify. All rights reserved.</p>
-      </footer>
+      {/* foooter*/}
+      <Footer />
     </div>
   );
 };
