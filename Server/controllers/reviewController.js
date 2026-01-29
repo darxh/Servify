@@ -16,11 +16,11 @@ const createReview = async (req, res) => {
       user: req.user._id,
       service: serviceId,
       status: "completed",
-    });
+    }).sort({ createdAt: -1 });
 
     if (!hasBooking) {
-      return res.status(403).json({ 
-        message: "You can only review services you have booked and completed." 
+      return res.status(403).json({
+        message: "You can only review services you have booked and completed."
       });
     }
 
@@ -32,7 +32,7 @@ const createReview = async (req, res) => {
 
     if (alreadyReviewed) {
       return res
-        .status(400) 
+        .status(400)
         .json({ message: "You have already reviewed this service" });
     }
 
@@ -43,6 +43,9 @@ const createReview = async (req, res) => {
       rating: Number(rating),
       comment,
     });
+
+    hasBooking.isReviewed = true;
+    await hasBooking.save();
 
     res.status(201).json(review);
   } catch (error) {
@@ -71,7 +74,7 @@ const deleteReview = async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
- 
+
     if (
       review.user.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"

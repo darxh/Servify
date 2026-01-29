@@ -1,202 +1,258 @@
 import { useState } from "react";
-import { useMyBookings } from "../../hooks/useMyBookings";
-import { useUpdateBooking } from "../../hooks/useUpdateBooking";
-import { useCancelBooking } from "../../hooks/useCancelBooking";
 import { useAuth } from "../../context/AuthContext";
-import { 
-  Calendar, 
-  MapPin, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  CheckCheck, 
-  Star, 
-  AlertCircle 
-} from "lucide-react";
+import { useMyBookings } from "../../hooks/useMyBookings";
+import { useCancelBooking } from "../../hooks/useCancelBooking";
+import { useUpdateBooking } from "../../hooks/useUpdateBooking";
 import ReviewModal from "../../features/reviews/components/ReviewModal";
+import { 
+  Calendar, MapPin, Clock, User, CheckCircle, XCircle, 
+  AlertTriangle, MessageSquare, Briefcase, ShoppingBag 
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const MyBookingsPage = () => {
   const { user } = useAuth();
-  const { data: bookings, isLoading, isError, error } = useMyBookings();
-   
+  const { data: bookings = [], isLoading } = useMyBookings();
+  const cancelBookingMutation = useCancelBooking();
   const updateBookingMutation = useUpdateBooking();
-  
-  const { mutate: cancelBooking, isPending: isCancelling } = useCancelBooking();
 
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [activeTab, setActiveTab] = useState("customer");
+  const [reviewModal, setReviewModal] = useState({ isOpen: false, serviceId: null });
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const customerBookings = bookings.filter(b => b.user?._id === user?._id);
+  const providerBookings = bookings.filter(b => b.provider?._id === user?._id);
 
-  if (isError) {
-    return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">Error: </strong>
-        <span className="block sm:inline">{error.message}</span>
-      </div>
-    );
-  }
-
-  // Provider: Change Status (Confirm, Reject/Cancel, Complete)
-  const handleStatusChange = (bookingId, newStatus) => {
-    updateBookingMutation.mutate({ bookingId, status: newStatus });
-  };
-
-  // User: Cancel Booking
-  const handleCancel = (bookingId) => {
-    if (window.confirm("Are you sure you want to cancel this booking?")) {
-      cancelBooking(bookingId, {
-        onSuccess: () => alert("Booking cancelled successfully!"),
-        onError: (err) => alert(err.response?.data?.message || "Failed to cancel"),
-      });
+  const handleCancel = (id) => {
+    if (window.confirm("Are you sure you want to cancel this?")) {
+      cancelBookingMutation.mutate(id);
     }
   };
 
-  const handleRateService = (serviceId) => {
-    setSelectedServiceId(serviceId);
-    setIsReviewModalOpen(true);
+  const handleStatusUpdate = (id, newStatus) => {
+    updateBookingMutation.mutate({ id, status: newStatus });
   };
 
+  const getServiceImage = (service) => {
+    if (!service) return "https://images.unsplash.com/photo-1581578731117-104f8a3d3dfa?auto=format&fit=crop&q=80"; 
+    if (service.images && service.images.length > 0) return service.images[0];
+    if (service.image) return service.image;
+    return "https://images.unsplash.com/photo-1581578731117-104f8a3d3dfa?auto=format&fit=crop&q=80";
+  };
+
+  const getStatusBadge = (status) => {
+    const styles = {
+      pending: "bg-amber-100 text-amber-800 border-amber-200",
+      confirmed: "bg-blue-100 text-blue-800 border-blue-200",
+      completed: "bg-green-100 text-green-800 border-green-200",
+      cancelled: "bg-red-100 text-red-800 border-red-200",
+    };
+    return (
+      <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wide ${styles[status] || "bg-gray-100"}`}>
+        {status}
+      </span>
+    );
+  };
+
+  if (isLoading) return (
+    <div className="flex h-96 items-center justify-center">
+       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+    </div>
+  );
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">My Bookings</h1>
-
-      {bookings?.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-gray-300">
-          <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-semibold text-gray-900">No bookings found</h3>
-          <p className="mt-1 text-sm text-gray-500">You haven't booked any services yet.</p>
+    <div className="space-y-8">
+      
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Bookings & Jobs</h1>
+          <p className="text-gray-500 mt-1">Track your service history and upcoming jobs.</p>
         </div>
-      ) : (
-        <div className="bg-white shadow overflow-hidden sm:rounded-md border border-gray-200">
-          <ul role="list" className="divide-y divide-gray-200">
-            {bookings.map((booking) => {
-              const isProvider = booking.provider?._id === user?._id;
-              
-              return (
-                <li key={booking._id} className="hover:bg-gray-50 transition-colors">
-                  <div className="px-4 py-5 sm:px-6">
-                    <div className="flex items-center justify-between mb-4">
-                      {/* Service Name */}
-                      <p className="text-lg font-medium text-blue-600 truncate">
-                        {booking.service?.name || "Unknown Service"}
-                      </p>
-                      
-                      {/* Status Badge & Actions */}
-                      <div className="flex flex-shrink-0 gap-3 items-center">
-                        <span className={`inline-flex items-center rounded-full px-3 py-0.5 text-sm font-medium
-                          ${booking.status === 'confirmed' ? 'bg-green-100 text-green-800' : 
-                            booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                            booking.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'}`}>
-                          {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                        </span>
+      </div>
 
-                        {/* provider actions*/}
-                        {isProvider && booking.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleStatusChange(booking._id, "confirmed")}
-                              disabled={updateBookingMutation.isPending}
-                              className="p-1 rounded-full text-green-600 hover:bg-green-100 transition-colors"
-                              title="Accept Booking"
-                            >
-                              <CheckCircle className="h-6 w-6" />
-                            </button>
-                            <button
-                              onClick={() => handleStatusChange(booking._id, "cancelled")} 
-                              disabled={updateBookingMutation.isPending}
-                              className="p-1 rounded-full text-red-600 hover:bg-red-100 transition-colors"
-                              title="Reject Booking"
-                            >
-                              <XCircle className="h-6 w-6" />
-                            </button>
-                          </div>
-                        )}
+      {user?.role === 'provider' ? (
+        <div className="bg-gray-100 p-1 rounded-xl inline-flex">
+          <button
+            onClick={() => setActiveTab("customer")}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === "customer" 
+                ? "bg-white text-gray-900 shadow-sm" 
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <ShoppingBag size={18} />
+            Booked by Me ({customerBookings.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("provider")}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+              activeTab === "provider" 
+                ? "bg-white text-blue-600 shadow-sm" 
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            <Briefcase size={18} />
+            Incoming Jobs ({providerBookings.length})
+          </button>
+        </div>
+      ) : null}
 
-                        {isProvider && booking.status === 'confirmed' && (
-                           <button
-                             onClick={() => handleStatusChange(booking._id, "completed")}
-                             disabled={updateBookingMutation.isPending}
-                             className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors"
-                           >
-                             <CheckCheck className="h-4 w-4" />
-                             <span>Mark Done</span>
-                           </button>
-                        )}
+      <div className="space-y-4">
+        
+        {(activeTab === "customer" ? customerBookings : providerBookings).length === 0 ? (
+          <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+             <div className="bg-white h-12 w-12 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                {activeTab === 'customer' ? <ShoppingBag className="h-6 w-6 text-gray-400" /> : <Briefcase className="h-6 w-6 text-gray-400" />}
+             </div>
+             <h3 className="text-sm font-bold text-gray-900">No {activeTab === 'customer' ? 'bookings' : 'jobs'} found</h3>
+             <p className="text-sm text-gray-500 mt-1">
+               {activeTab === 'customer' ? "You haven't booked any services yet." : "No one has booked your services yet."}
+             </p>
+          </div>
+        ) : (
+          (activeTab === "customer" ? customerBookings : providerBookings).map((booking) => (
+            <div 
+              key={booking._id} 
+              className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all group"
+            >
+              <div className="flex flex-col md:flex-row gap-6">
+                
+                {/* Image Thumbnail */}
+                <div className="w-full md:w-40 h-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative">
+                  <img 
+                    src={getServiceImage(booking.service)} 
+                    alt={booking.service?.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-2 right-2 md:hidden">
+                    {getStatusBadge(booking.status)}
+                  </div>
+                </div>
 
-                        {/* user actions */}
-                        {/* cancel Booking  */}
-                        {!isProvider && (booking.status === 'pending' || booking.status === 'confirmed') && (
-                           <button
-                             onClick={() => handleCancel(booking._id)}
-                             disabled={isCancelling}
-                             className="flex items-center gap-1 border border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 px-3 py-1 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
-                           >
-                             <AlertCircle className="h-4 w-4" />
-                             <span>{isCancelling ? "Cancelling..." : "Cancel"}</span>
-                           </button>
-                        )}
-
-                        {/* Rate Service */}
-                        {!isProvider && booking.status === 'completed' && (
-                           <button
-                             onClick={() => handleRateService(booking.service?._id)}
-                             className="flex items-center gap-1 bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors shadow-sm"
-                           >
-                             <Star className="h-4 w-4 fill-white" />
-                             <span>Rate</span>
-                           </button>
-                        )}
-                        
+                {/* Info Section */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+                          {booking.service?.name || "Unknown Service"}
+                        </h3>
+                        <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                          {activeTab === 'customer' ? (
+                            <>Provided by <span className="font-semibold text-gray-900">{booking.provider?.name}</span></>
+                          ) : (
+                            <>Customer: <span className="font-semibold text-blue-600 flex items-center gap-1"><User size={14}/> {booking.user?.name}</span></>
+                          )}
+                        </p>
+                      </div>
+                      <div className="hidden md:block">
+                        {getStatusBadge(booking.status)}
                       </div>
                     </div>
-                    
-                    {/* Booking Details */}
-                    <div className="sm:flex sm:justify-between text-sm text-gray-500">
-                      <div className="flex flex-col sm:flex-row sm:gap-6 gap-2">
-                        <p className="flex items-center">
-                          <Clock className="mr-1.5 h-4 w-4 text-gray-400" />
-                          <span className="font-medium text-gray-900 mr-1">Date:</span>
-                          {new Date(booking.bookingDate).toLocaleDateString(undefined, {
-                            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
-                          })}
-                        </p>
-                        <p className="flex items-center">
-                          <MapPin className="mr-1.5 h-4 w-4 text-gray-400" />
-                          <span className="font-medium text-gray-900 mr-1">Address:</span>
-                          {booking.address}
-                        </p>
-                      </div>
-                      
-                      <div className="mt-2 sm:mt-0 flex items-center">
-                        <p>
-                          {isProvider ? "Customer: " : "Provider: "}
-                          <span className="font-medium text-gray-900">
-                            {isProvider ? booking.user?.name : booking.provider?.name}
-                          </span>
-                        </p>
-                      </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={16} className="text-gray-400" />
+                          <span>{new Date(booking.date || booking.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock size={16} className="text-gray-400" />
+                          <span>{booking.service?.duration || 60} mins</span>
+                        </div>
+                        <div className="flex items-center gap-2 col-span-2 md:col-span-1">
+                          <MapPin size={16} className="text-gray-400" />
+                          <span className="truncate max-w-[150px]">{booking.address || "123 Main St"}</span>
+                        </div>
                     </div>
                   </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
 
-      <ReviewModal 
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        serviceId={selectedServiceId}
-      />
+                  {/* Action Bar */}
+                  <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+                      <span className="font-bold text-lg text-gray-900">${booking.price}</span>
+
+                      <div className="flex gap-2">
+                        
+                        {activeTab === 'customer' && (
+                          <>
+                            {["pending", "confirmed"].includes(booking.status) && (
+                              <button 
+                                onClick={() => handleCancel(booking._id)}
+                                disabled={cancelBookingMutation.isPending}
+                                className="px-4 py-2 border border-gray-300 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition"
+                              >
+                                Cancel Booking
+                              </button>
+                            )}
+
+                            {booking.status === "completed" && !booking.isReviewed && (
+                              <button 
+                                onClick={() => setReviewModal({ isOpen: true, serviceId: booking.service?._id })}
+                                className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-black transition flex items-center gap-2"
+                              >
+                                <MessageSquare size={16} /> Leave Review
+                              </button>
+                            )}
+
+                            {booking.isReviewed && (
+                                <span className="text-sm text-green-600 font-bold flex items-center gap-1 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
+                                    <CheckCircle size={14} /> Reviewed
+                                </span>
+                            )}
+                          </>
+                        )}
+
+                        {activeTab === 'provider' && (
+                          <>
+                            {booking.status === "pending" && (
+                              <>
+                                <button 
+                                  onClick={() => handleStatusUpdate(booking._id, "cancelled")}
+                                  className="px-4 py-2 border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <XCircle size={16} /> Reject
+                                </button>
+                                <button 
+                                  onClick={() => handleStatusUpdate(booking._id, "confirmed")}
+                                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                                >
+                                  <CheckCircle size={16} /> Accept Job
+                                </button>
+                              </>
+                            )}
+                            {booking.status === "confirmed" && (
+                              <button 
+                                onClick={() => handleStatusUpdate(booking._id, "completed")}
+                                className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 flex items-center gap-2"
+                              >
+                                <CheckCircle size={16} /> Mark Completed
+                              </button>
+                            )}
+                          </>
+                        )}
+
+                        {/* Common: View Service */}
+                        <Link 
+                          to={`/services/${booking.service?._id}`}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition"
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {reviewModal.isOpen && (
+        <ReviewModal
+          isOpen={reviewModal.isOpen}
+          onClose={() => setReviewModal({ isOpen: false, serviceId: null })}
+          serviceId={reviewModal.serviceId}
+        />
+      )}
     </div>
   );
 };

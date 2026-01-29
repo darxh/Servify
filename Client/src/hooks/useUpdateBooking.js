@@ -5,14 +5,18 @@ export const useUpdateBooking = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ bookingId, status }) => {
-      const { data } = await apiClient.put(`/bookings/${bookingId}`, {
+    mutationFn: async ({ id, status }) => {
+      const { data } = await apiClient.put(`/bookings/${id}`, {
         status,
       });
       return data;
     },
-    onSuccess: () => {
+    onSuccess: () => { 
+      queryClient.invalidateQueries(["my-bookings"]); 
       queryClient.invalidateQueries(["bookings"]);
     },
+    onError: (error) => {
+        alert(error.response?.data?.message || "Failed to update booking status");
+    }
   });
 };

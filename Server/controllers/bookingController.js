@@ -71,9 +71,10 @@ const getMyBookings = async (req, res) => {
     const bookings = await Booking.find({
       $or: [{ user: req.user._id }, { provider: req.user._id }],
     })
-      .populate("service", "name price")
+      .populate("service", "name price image images duration category") 
       .populate("user", "name email")
-      .populate("provider", "name");
+      .populate("provider", "name email")
+      .sort("-createdAt");
 
     res.json(bookings);
   } catch (error) {
