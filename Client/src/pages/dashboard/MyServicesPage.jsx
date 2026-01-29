@@ -1,139 +1,127 @@
 import { Link } from "react-router-dom";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, MoreVertical, Briefcase } from "lucide-react";
 import { useServices } from "../../hooks/useServices";
 import { useDeleteService } from "../../hooks/useDeleteService";
 import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 
 const MyServicesPage = () => {
   const { user } = useAuth();
-  // Fetch all services. In a real app, you might want a specific endpoint like /services/my-services
-  // to avoid filtering on the client, but this works for now.
-  const { data: services, isLoading } = useServices();
+  const { data: services = [], isLoading } = useServices();
   const { mutate: deleteService } = useDeleteService();
 
-  const myServices =
-    services?.filter((service) => {
+  const myServices = services.filter((service) => {
       const providerId = service.provider?._id || service.provider;
       return providerId === user?._id;
-    }) || [];
+  });
 
   const handleDelete = (id) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this service? This cannot be undone."
-      )
-    ) {
+    if (window.confirm("Are you sure you want to delete this service? This cannot be undone.")) {
       deleteService(id);
     }
   };
 
-  if (isLoading) return <div>Loading your services...</div>;
+  const getServiceImage = (service) => {
+    if (!service) return "https://images.unsplash.com/photo-1581578731117-104f8a3d3dfa?auto=format&fit=crop&q=80";
+    if (service.images && service.images.length > 0) return service.images[0];
+    if (service.image) return service.image;
+    return "https://images.unsplash.com/photo-1581578731117-104f8a3d3dfa?auto=format&fit=crop&q=80";
+  };
+
+  if (isLoading) return (
+    <div className="flex h-96 items-center justify-center">
+       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+    </div>
+  );
 
   return (
-    <div>
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold leading-6 text-gray-900">
-            My Services
-          </h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Manage the services you offer.
-          </p>
-        </div>
-        <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-          <Link
-            to="/dashboard/services/new"
-            className="block rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
-          >
-            <Plus className="inline-block h-4 w-4 mr-1" />
-            Add Service
-          </Link>
+    <div className="space-y-8 pb-12">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">My Services</h1>
+          <p className="text-gray-500 mt-1">Manage the services you offer to clients.</p>
         </div>
       </div>
 
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            {myServices.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
-                <p className="text-gray-500">
-                  You haven't posted any services yet.
-                </p>
-              </div>
-            ) : (
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead>
-                  <tr>
-                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                      Name
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Price
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Category
-                    </th>
-                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {myServices.map((service) => (
-                    <tr key={service._id}>
-                      <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
-                        <div className="flex items-center">
-                          <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-gray-100">
-                            <img
-                              className="h-full w-full object-cover"
-                              src={
-                                service.image ||
-                                "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                              }
-                              alt="deafult image"
-                            />
-                          </div>
-                          <div className="ml-4">
-                            <div className="font-medium text-gray-900">
-                              {service.name}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                        ${service.price}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                        <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                          {service.category?.name || "General"}
-                        </span>
-                      </td>
-                      <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                        
-                        <Link
-                          to={`/dashboard/services/edit/${service._id}`}
-                          className="text-blue-600 hover:text-blue-900 mr-4 inline-block"
-                          title="Edit Service"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-
-                        <button
-                          onClick={() => handleDelete(service._id)}
-                          className="text-red-600 hover:text-red-900 inline-block"
-                          title="Delete Service"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+      {/* Grid Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        
+        {/*  "Add New Service" Button */}
+        <Link 
+          to="/dashboard/services/new"
+          className="group flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all min-h-[300px] cursor-pointer"
+        >
+          <div className="h-14 w-14 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors mb-4 text-gray-400">
+            <Plus size={28} />
           </div>
-        </div>
+          <h3 className="font-bold text-gray-900 group-hover:text-blue-600">Post New Service</h3>
+          <p className="text-sm text-center text-gray-500 mt-1 px-4">Create a new offering to start earning.</p>
+        </Link>
+
+        {/* Service Cards */}
+        {myServices.map((service) => (
+          <div 
+            key={service._id} 
+            className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group"
+          >
+            
+            {/* Image Area */}
+            <div className="relative h-48 bg-gray-100 overflow-hidden">
+              <img 
+                src={getServiceImage(service)} 
+                alt={service.name} 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              {/* Category Badge */}
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
+                 {service.category?.name || "Service"}
+              </div>
+              
+              {/* Price Tag */}
+              <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
+                 ${service.price}
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="p-5 flex flex-col flex-grow">
+              <h3 className="font-bold text-gray-900 line-clamp-1 text-lg mb-1" title={service.name}>
+                {service.name}
+              </h3>
+              
+              {/* Stats Row */}
+              <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mt-1 mb-4">
+                 <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100">
+                    Active
+                 </span>
+                 <span>•</span>
+                 <span>{service.duration} mins</span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-auto grid grid-cols-2 gap-3 pt-4 border-t border-gray-100">
+                <Link
+                  to={`/dashboard/services/edit/${service._id}`}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-gray-50 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-100 transition border border-gray-200"
+                >
+                  <Pencil size={14} /> Edit
+                </Link>
+                
+                <button
+                  onClick={() => handleDelete(service._id)}
+                  className="flex items-center justify-center gap-2 px-3 py-2 bg-white text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition border border-gray-200"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              </div>
+            </div>
+
+          </div>
+        ))}
       </div>
+
     </div>
   );
 };
