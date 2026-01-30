@@ -93,10 +93,10 @@ const getServiceById = async (req, res) => {
   try {
     const service = await Service.findById(req.params.id)
       .populate("category", "name")
-      .populate("provider", "name email")
+      .populate("provider", "name email profileImage bio")
       .populate({
         path: "reviews",
-        populate: { path: "user", select: "name" }
+        populate: { path: "user", select: "name profileImage" }
       });
 
     if (!service) {
