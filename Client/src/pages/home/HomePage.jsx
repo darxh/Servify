@@ -21,38 +21,39 @@ const HomePage = () => {
     <div className="bg-white min-h-screen flex flex-col font-sans">
        
       <header className="absolute inset-x-0 top-0 z-50">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between p-6 lg:px-8" aria-label="Global">
+        
+        <nav className="max-w-7xl mx-auto flex items-center justify-between p-4 lg:px-8" aria-label="Global">
           
-          {/* Logo Section */}
           <div className="flex lg:flex-1">
             <Link to="/" className="-m-1.5 p-1.5 flex items-center gap-2 group">
-              <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">Servify</span>
+              <span className="text-xl md:text-2xl font-bold text-white tracking-tight drop-shadow-md">
+                Servify
+              </span>
             </Link>
           </div>
 
-          {/* Navigation / Auth Buttons */}
-          <div className="flex flex-1 justify-end gap-x-4">
+          <div className="flex flex-1 justify-end gap-x-3 md:gap-x-4">
             {isAuthenticated ? (
-              // logged in case
               <>
                 <Link
                   to="/dashboard"
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5
+                  p-2.5 md:px-6 md:py-2.5 text-sm" 
                 >
                   <LayoutDashboard size={18} />
-                  Dashboard
+                  <span className="hidden md:inline">Dashboard</span>
                 </Link>
                 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-all backdrop-blur-sm border border-white/10"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white rounded-full font-semibold transition-all backdrop-blur-sm border border-white/10
+                  p-2.5 md:px-4 md:py-2.5 text-sm"
                 >
                   <LogOut size={18} />
-                  Logout
+                  <span className="hidden md:inline">Logout</span>
                 </button>
               </>
             ) : (
-              // logged out case
               <>
                 <Link
                   to="/auth/login"
@@ -63,10 +64,11 @@ const HomePage = () => {
                 </Link>
                 <Link
                   to="/auth/register"
-                  className="flex items-center gap-2 bg-white text-blue-900 hover:bg-gray-100 px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 bg-white text-blue-900 hover:bg-gray-100 px-4 py-2 md:px-6 md:py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg transform hover:-translate-y-0.5"
                 >
                   <UserPlus size={18} />
-                  Sign up
+                  <span className="md:hidden">Join</span>
+                  <span className="hidden md:inline">Sign up</span>
                 </Link>
               </>
             )}
@@ -75,22 +77,12 @@ const HomePage = () => {
       </header>
 
       <main className="flex-grow">
-        
-        {/* Hero */}
         <Hero />
-        
-        {/* Categories */}
         <CategorySection />
-        
-        {/* How It Works section */}
         <HowItWorks />
-        
-        {/* Featured Services */}
         <FeaturedServices />
         
-        {/* Final CTA Section*/}
         <div className="bg-gradient-to-br from-blue-900 to-gray-900 py-20 relative overflow-hidden">
-
            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl"></div>
            
            <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
@@ -113,7 +105,6 @@ const HomePage = () => {
         </div>
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
