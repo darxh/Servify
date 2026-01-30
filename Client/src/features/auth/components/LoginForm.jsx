@@ -5,8 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"), // Must be a valid email format
-  password: z.string().min(6, "Password must be at least 6 characters"), // Min length rule
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 const LoginForm = () => {
@@ -25,7 +25,7 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     try {
       await login(data);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       setError("root", { 
         message: error.response?.data?.message || "Login failed. Please try again." 

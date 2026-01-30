@@ -3,12 +3,19 @@ import CategorySection from "../../features/home/components/CategorySection";
 import FeaturedServices from "../../features/home/components/FeaturedServices";
 import HowItWorks from "../../features/home/components/HowItWorks";
 import Footer from "../../features/home/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { LayoutDashboard, LogIn, UserPlus } from "lucide-react";
+import { LayoutDashboard, LogIn, UserPlus, LogOut } from "lucide-react";
 
 const HomePage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    window.location.reload(); 
+  };
 
   return (
     <div className="bg-white min-h-screen flex flex-col font-sans">
@@ -26,14 +33,26 @@ const HomePage = () => {
           {/* Navigation / Auth Buttons */}
           <div className="flex flex-1 justify-end gap-x-4">
             {isAuthenticated ? (
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
-              >
-                <LayoutDashboard size={18} />
-                Go to Dashboard
-              </Link>
+              // logged in case
+              <>
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5"
+                >
+                  <LayoutDashboard size={18} />
+                  Dashboard
+                </Link>
+                
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-full text-sm font-semibold transition-all backdrop-blur-sm border border-white/10"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </>
             ) : (
+              // logged out case
               <>
                 <Link
                   to="/auth/login"
@@ -94,7 +113,7 @@ const HomePage = () => {
         </div>
       </main>
 
-      {/* foooter*/}
+      {/* Footer */}
       <Footer />
     </div>
   );
