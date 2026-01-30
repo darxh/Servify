@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext";
-import { useUpdateProfile } from "../../hooks/useUpdateProfile";
+import { useUpdateProfile } from "../../hooks/useUpdateProfile"; 
 import { User, Mail, Lock, Camera, Save, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -9,11 +9,10 @@ const SettingsPage = () => {
   const updateProfileMutation = useUpdateProfile();
   
   const { register, handleSubmit, reset, formState: { isDirty } } = useForm();
-   
+  
   const [preview, setPreview] = useState(user?.profileImage || null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  // Pre-fill form
   useEffect(() => {
     if (user) {
       reset({
@@ -25,7 +24,6 @@ const SettingsPage = () => {
     }
   }, [user, reset]);
 
-  // Handle Image Selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -38,22 +36,29 @@ const SettingsPage = () => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("bio", data.bio);
-     
+    
     if (data.password) {
       formData.append("password", data.password);
     }
- 
+
     if (selectedFile) {
       formData.append("profileImage", selectedFile);
     }
 
-    updateProfileMutation.mutate(formData);
+    updateProfileMutation.mutate(formData, {
+      onSuccess: () => {
+        alert("Profile updated successfully!!");
+        setSelectedFile(null);
+      },
+      onError: (error) => {
+        alert("Failed to update profile: " + (error.response?.data?.message || "Unknown error"));
+      }
+    });
   };
 
   return (
     <div className="max-w-4xl mx-auto pb-20">
       
-      {/* Page Header */}
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
         <p className="text-gray-500 mt-2">Manage your profile and security preferences.</p>
@@ -61,11 +66,9 @@ const SettingsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center sticky top-24">
             
-            {/* Avatar Uploader */}
             <div className="relative inline-block mb-4 group">
               <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-100 mx-auto">
                 {preview ? (
@@ -77,7 +80,6 @@ const SettingsPage = () => {
                 )}
               </div>
               
-              {/* Camera Icon Overlay */}
               <label 
                 htmlFor="avatar-upload"
                 className="absolute bottom-1 right-1 bg-blue-600 text-white p-2.5 rounded-full cursor-pointer hover:bg-blue-700 transition shadow-md"
@@ -97,12 +99,11 @@ const SettingsPage = () => {
             <p className="text-sm text-gray-500 mb-4 capitalize">{user?.role}</p>
             
             <div className="text-xs text-gray-400 bg-gray-50 py-2 px-4 rounded-full inline-block">
-              Member since {new Date(user?.createdAt).getFullYear()}
+              Member since {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}
             </div>
           </div>
         </div>
 
-        {/*  Edit Form */}
         <div className="lg:col-span-2">
           <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
             
@@ -111,7 +112,6 @@ const SettingsPage = () => {
                 Profile Details
               </h3>
 
-              {/* Name */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
                 <div className="relative">
@@ -124,7 +124,6 @@ const SettingsPage = () => {
                 </div>
               </div>
 
-              {/* Email  */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
                 <div className="relative opacity-60 cursor-not-allowed">
@@ -139,7 +138,6 @@ const SettingsPage = () => {
                 <p className="text-xs text-gray-400 mt-1.5 ml-1">Email cannot be changed.</p>
               </div>
 
-              {/* Bio */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Bio / About Me</label>
                 <textarea
@@ -154,7 +152,6 @@ const SettingsPage = () => {
                 Security
               </h3>
 
-              {/* Password */}
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">New Password</label>
                 <div className="relative">
@@ -169,7 +166,6 @@ const SettingsPage = () => {
               </div>
             </div>
 
-            {/* Footer Actions */}
             <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex items-center justify-end">
               <button
                 type="submit"

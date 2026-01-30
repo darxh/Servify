@@ -34,17 +34,13 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-white border-r border-gray-100 h-screen flex flex-col fixed left-0 top-0 z-50">
       
-      {/*  Logo Area */}
       <div className="p-6 border-b border-gray-100">
         <Link to="/" className="flex items-center gap-2">
-          {/* <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            S
-          </div> */}
+          {/* <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">S</div> */}
           <span className="text-xl font-bold text-gray-900 tracking-tight">Servify</span>
         </Link>
       </div>
 
-      {/* Navigation Links */}
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         
         <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-2">
@@ -66,7 +62,6 @@ const Sidebar = () => {
           <span>My Bookings</span>
         </Link>
 
-        {/* provider links */}
         {(user?.role === "provider" || user?.role === "admin") && (
           <>
             <p className="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">
@@ -96,11 +91,19 @@ const Sidebar = () => {
 
       </nav>
 
-      {/* 3. User Footer  */}
       <div className="p-4 border-t border-gray-100">
         <div className="bg-gray-50 rounded-xl p-3 flex items-center gap-3">
-          <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center border border-gray-200 text-gray-400 shrink-0">
-             <User size={20} />
+          
+          <div className="h-10 w-10 rounded-full overflow-hidden border border-gray-200 shrink-0 bg-white flex items-center justify-center">
+            {user?.profileImage ? (
+              <img 
+                src={user.profileImage} 
+                alt="Profile" 
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <User size={20} className="text-gray-400" />
+            )}
           </div>
           
           <div className="flex-1 min-w-0">
