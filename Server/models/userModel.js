@@ -32,6 +32,15 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "provider", "admin"],
       default: "user",
     },
+    profileImage: {
+      type: String,
+      default: "", 
+    },
+    bio: {
+      type: String,
+      maxLength: [500, "Bio cannot exceed 500 characters"],
+      default: "",
+    }
   },
   {
     timestamps: true,
