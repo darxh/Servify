@@ -128,8 +128,12 @@ const updateService = async (req, res) => {
     service.duration = duration || service.duration;
     service.category = category || service.category;
 
+    // if (req.files && req.files.length > 0) {
+    //   service.images = req.files.map((file) => file.path);
+    // }
     if (req.files && req.files.length > 0) {
-      service.images = req.files.map((file) => file.path);
+      const newImagePaths = req.files.map((file) => file.path);
+      service.images = [...(service.images || []), ...newImagePaths];
     }
 
     const updatedService = await service.save();
