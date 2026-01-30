@@ -20,15 +20,15 @@ const PORT = process.env.PORT || 8080;
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      process.env.CLIENT_URL
-    ],
-    credentials: true,
-  })
-);
+// Server/server.js
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', 
+    'https://servify-olive.vercel.app/'
+  ],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 //routes
 app.use("/api/v1/auth", authRoutes);
