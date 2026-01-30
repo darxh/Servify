@@ -76,9 +76,10 @@ const getAllServices = async (req, res) => {
     }
 
     const services = await Service.find(filters)
-      .populate("category", "name slug")
-      .populate("provider", "name email")
-      .sort(sortOption);
+    .populate("category", "name slug")
+    .populate("provider", "name email profileImage")
+    .populate("reviews") 
+    .sort(sortOption);
 
     res.json({ count: services.length, services });
   } catch (error) {

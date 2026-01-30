@@ -1,154 +1,159 @@
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useServices } from "../../../hooks/useServices";
-import { Star, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, MapPin, ChevronLeft, ChevronRight, ArrowRight, User } from "lucide-react";
 
 const FeaturedServices = () => { 
-  // 1. Data Fetching
-  const { data, isLoading, isError, error } = useServices();
+  const { data: services = [], isLoading, isError } = useServices(); 
   
-  // Safe check: handle if 'data' is the array or if 'data.services' is the array
-  const servicesList = data?.services || data || [];
-  
-  // 2. Logic: Show top 10 services instead of just 3
-  const services = servicesList.slice(0, 10);
-  
-  // 3. Scroll Logic
   const scrollRef = useRef(null);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
       const { current } = scrollRef.current;
-      const scrollAmount = direction === "left" ? -350 : 350; // Scroll by roughly one card width
+      const scrollAmount = direction === "left" ? -400 : 400;
       current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
-  // --- LOADING / ERROR STATES (Kept Exactly as you had them) ---
-  if (isLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center bg-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-      </div>
-    );
-  }
+  const getServiceImage = (service) => {
+    if (service.images && service.images.length > 0) return service.images[0];
+    if (service.image) return service.image;
+    return "https://images.unsplash.com/photo-1581578731117-104f8a3d3dfa?auto=format&fit=crop&q=80";
+  };
+
+  const getRating = (reviews) => {
+    if (!reviews || reviews.length === 0) return "New";
+    const total = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return (total / reviews.length).toFixed(1);
+  };
+
+  if (isLoading) return (
+    <div className="py-24 flex justify-center">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
+    </div>
+  );
  
-  if (isError) {
-    return (
-      <div className="bg-white py-12 text-center">
-        <p className="text-red-500">Error loading services: {error.message}</p>
-        <p className="text-sm text-gray-500">Is your backend server running?</p>
-      </div>
-    );
-  }
+  if (isError || !services || services.length === 0) return null;
  
-  if (!services || services.length === 0) {
-    return (
-      <div className="bg-white py-12 text-center">
-        <p className="text-gray-500">No services found available right now.</p>
-      </div>
-    );
-  }
- 
+  const displayedServices = services.slice(0, 8);
+
   return (
-    <div className="bg-white py-24 sm:py-32 group/section">
+    <div className="bg-gray-50/50 py-24 group/section">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Top Rated Services
-          </h2>
-          <p className="mt-2 text-lg leading-8 text-gray-600">
-            Highly recommended professionals near you.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+              Featured Services
+            </h2>
+            <p className="mt-2 text-lg text-gray-500">
+              Handpicked professionals for your needs.
+            </p>
+          </div>
+          <Link 
+            to="/services" 
+            className="hidden md:flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            View All Services <ArrowRight size={16} />
+          </Link>
         </div>
 
-        {/* --- SCROLLABLE CONTAINER WRAPPER --- */}
         <div className="relative">
 
-          {/* Left Arrow Button */}
           <button 
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white border border-gray-200 shadow-lg rounded-full p-3 text-gray-700 hover:scale-110 transition-all hidden md:flex opacity-0 group-hover/section:opacity-100"
+            className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-100 shadow-xl rounded-full p-3 text-gray-700 hover:scale-110 transition-all hidden md:flex opacity-0 group-hover/section:opacity-100"
           >
             <ChevronLeft size={24} />
           </button>
 
-          {/* The Scroll List (Replaces the Grid) */}
           <div 
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto pb-8 pt-2 snap-x snap-mandatory scrollbar-hide px-2"
+            className="flex gap-6 overflow-x-auto pb-8 pt-2 snap-x snap-mandatory scrollbar-hide px-2 -mx-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {/* Hide Scrollbar Style */}
             <style>{` .scrollbar-hide::-webkit-scrollbar { display: none; } `}</style>
 
-            {services.map((service) => (
-              <div key={service._id} className="min-w-[320px] md:min-w-[380px] snap-center flex">
+            {displayedServices.map((service) => (
+              <div key={service._id} className="min-w-[300px] md:min-w-[340px] snap-center">
                 
-                {/* --- YOUR EXACT CARD DESIGN (Copied Verbatim) --- */}
-                <article className="flex w-full flex-col items-start justify-between rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md">
+                <Link 
+                  to={`/services/${service._id}`}
+                  className="block group h-full bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                >
                     
-                  <div className="relative h-48 w-full overflow-hidden rounded-xl bg-gray-100">
+                  <div className="relative h-48 bg-gray-200 overflow-hidden">
                     <img
-                      src={
-                        (service.images && service.images.length > 0) 
-                          ? service.images[0] 
-                          : (service.image || "https://plus.unsplash.com/premium_photo-1682141713992-b54999985c32?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
-                      }
+                      src={getServiceImage(service)}
                       alt={service.name}
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 right-4 rounded-full bg-white px-2 py-1 text-xs font-bold text-gray-900 shadow-sm">
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm border border-white/50">
                       ${service.price}
                     </div>
+                    <div className="absolute top-3 left-3 bg-blue-600/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">
+                      {service.category?.name || "Service"}
+                    </div>
                   </div>
 
-                  <div className="max-w-xl w-full flex flex-col flex-grow">
-                    <div className="mt-4 flex items-center gap-x-4 text-xs">
-                      <span className="relative z-10 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-600">
-                        {service.category?.name || "General"}
-                      </span>
-                      <div className="flex items-center gap-x-1 text-yellow-500">
-                        <Star className="h-4 w-4 fill-current" />
-                        <span>4.8 (12 reviews)</span>
-                      </div>
-                    </div>
+                  <div className="p-5 flex flex-col h-[calc(100%-192px)]">
                     
-                    <div className="group relative mt-3">
-                      <h3 className="text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600 line-clamp-1">
-                        <Link to={`/services/${service._id}`}>
-                          <span className="absolute inset-0" />
-                          {service.name}
-                        </Link>
-                      </h3>
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-600">
-                        {service.description}
-                      </p>
-                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1 mb-2">
+                      {service.name}
+                    </h3>
+                    
+                    <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">
+                      {service.description}
+                    </p>
 
-                    <div className="mt-6 flex items-center gap-x-2 border-t pt-4 w-full mt-auto">
-                        <MapPin className="h-4 w-4 text-gray-400" />
-                        <p className="text-xs text-gray-500">Service Area: Downtown & 5 miles</p>
+                    <div className="border-t border-gray-50 pt-4 mt-auto">
+                      
+                      <div className="flex items-center justify-between">
+                        
+                        {/* Provider Avatar */}
+                        <div className="flex items-center gap-2">
+                           <div className="h-6 w-6 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
+                              {service.provider?.profileImage ? (
+                                <img src={service.provider.profileImage} className="h-full w-full object-cover" alt="Provider" />
+                              ) : (
+                                <User size={14} className="text-gray-400" />
+                              )}
+                           </div>
+                           <span className="text-xs font-semibold text-gray-600 truncate max-w-[100px]">
+                             {service.provider?.name}
+                           </span>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded-md">
+                           <Star size={12} className="fill-orange-400 text-orange-400" /> 
+                           <span>{getRating(service.reviews)}</span>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
-                </article>
-                {/* --- END CARD DESIGN --- */}
+                </Link>
 
               </div>
             ))}
           </div>
 
-          {/* Right Arrow Button */}
           <button 
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white border border-gray-200 shadow-lg rounded-full p-3 text-gray-700 hover:scale-110 transition-all hidden md:flex opacity-0 group-hover/section:opacity-100"
+            className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-100 shadow-xl rounded-full p-3 text-gray-700 hover:scale-110 transition-all hidden md:flex opacity-0 group-hover/section:opacity-100"
           >
             <ChevronRight size={24} />
           </button>
 
         </div>
+
+        <div className="mt-8 text-center md:hidden">
+           <Link to="/services" className="inline-block px-6 py-3 border border-gray-300 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50">
+              View All Services
+           </Link>
+        </div>
+
       </div>
     </div>
   );
