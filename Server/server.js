@@ -21,19 +21,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Server/server.js
-// const corsOptions = {
-//   origin: process.env.CLIENT_URL || "http://localhost:5173",
-//   credentials: true,
-//   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-// };
-// app.use(cors(corsOptions));
 const corsOptions = {
   origin: [
-    "http://localhost:5173",                // Local Frontend
-    "http://localhost:5174",                // Alternate Local Port (just in case)
-    process.env.CLIENT_URL                  // Deployed Frontend (from .env)
-  ].filter(Boolean),                        // Removes empty values if .env is missing
+    "http://localhost:5173",
+    "http://localhost:5174",
+    process.env.CLIENT_URL
+  ].filter(Boolean),
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],

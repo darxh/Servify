@@ -34,13 +34,23 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: {
       type: String,
-      default: "", 
+      default: "",
     },
     bio: {
       type: String,
       maxLength: [500, "Bio cannot exceed 500 characters"],
       default: "",
-    }
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
+    verificationTokenExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
