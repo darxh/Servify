@@ -1,55 +1,113 @@
+const crypto = require("crypto")
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
-const bcrypt = require("bcryptjs");
+const sendEmail = require("../utils/sendEmail");
+const { verifyEmailTemplate } = require("../utils/emailTemplates");
 
+// @desc    Register new user & Send Verification Email
+// @route   POST /api/v1/auth/register
+// @access  Public
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    const userExists = await User.findOne({ email });
 
+    const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: "user already exists" });
+      return res.status(400).json({ message: "User already exists" });
     }
-    let safeRole = "user";
-    if (role === "provider") {
-      safeRole = "provider";
-    }
+
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
 
     const user = await User.create({
       name,
       email,
       password,
-      role: safeRole,
+      role: role === "provider" ? "provider" : "user",
+      verificationToken: hashedToken,
+      verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000,
     });
 
     if (user) {
-      const accessToken = generateToken(res, user._id);
+      const verifyUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/api/v1/auth/verify/${verificationToken}`;
 
-      res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        profileImage: user.profileImage,
-        bio: user.bio,
-        accessToken: accessToken,
-      });
-    } else {
-      res.status(500).json({ message: "invalid user data" });
+      const message = verifyEmailTemplate(verifyUrl, user.name);
+
+      try {
+        await sendEmail({
+          email: user.email,
+          subject: "Servify Email Verification",
+          message,
+        });
+
+        res.status(201).json({
+          message: "Registration successful! Please check your email.",
+        });
+      } catch (error) {
+        await user.deleteOne();
+        res.status(500).json({ message: "Email could not be sent" });
+      }
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };
 
+// @desc    Verify User Email
+// @route   GET /api/v1/auth/verify/:token
+// @access  Public
+const verifyEmail = async (req, res) => {
+  try {
+    const token = req.params.token;
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      verificationToken: hashedToken,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.redirect(`${process.env.CLIENT_URL}/auth/login?error=invalid_token`);
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    await user.save();
+
+    res.redirect(`${process.env.CLIENT_URL}/auth/login?verified=true`);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Authenticate a user
+// @route   POST /api/v1/auth/login
+// @access  Public
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email }).select("+password");
 
+    // Check password
     if (user && (await user.comparePassword(password))) {
+
+      // --- NEW CHECK: IS VERIFIED? ---
+      if (!user.isVerified) {
+        return res.status(401).json({ message: "Please verify your email first." });
+      }
+
       const accessToken = generateToken(res, user._id);
 
       res.json({
@@ -72,7 +130,6 @@ const loginUser = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-
     res.status(201).json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -93,7 +150,7 @@ const updateUserProfile = async (req, res) => {
       }
 
       if (req.file) {
-        user.profileImage = req.file.path; 
+        user.profileImage = req.file.path;
       }
 
       const updatedUser = await user.save();
@@ -114,4 +171,4 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateUserProfile, };
+module.exports = { registerUser, verifyEmail, loginUser, getMe, updateUserProfile };

@@ -1,12 +1,17 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext"; // Using context directly for login
-import { Loader2, Mail, Lock, ArrowLeft } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { Loader2, Mail, Lock, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm();
+
+  const queryParams = new URLSearchParams(location.search);
+  const isVerified = queryParams.get("verified") === "true";
+  const isError = queryParams.get("error");
 
   const onSubmit = async (data) => {
     try {
@@ -31,6 +36,21 @@ const LoginPage = () => {
            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome back</h1>
            <p className="text-gray-500 mt-2 text-sm">Enter your details to access your account.</p>
         </div>
+
+        {/* verification banners */}
+        {isVerified && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700">
+            <CheckCircle size={20} />
+            <p className="text-sm font-medium">Email verified successfully! Please login.</p>
+          </div>
+        )}
+
+        {isError && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
+            <XCircle size={20} />
+            <p className="text-sm font-medium">Verification failed. The link may be invalid or expired.</p>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -74,14 +94,12 @@ const LoginPage = () => {
             {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
           </div>
 
-          {/* Global Error */}
           {errors.root && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
               {errors.root.message}
             </div>
           )}
 
-          {/* Submit Button */}
           <button 
             type="submit" 
             disabled={isSubmitting}
@@ -92,7 +110,6 @@ const LoginPage = () => {
 
         </form>
 
-        {/* Footer */}
         <p className="mt-8 text-center text-sm text-gray-600">
           New to Servify?{" "}
           <Link to="/auth/register" className="font-bold text-blue-600 hover:underline">

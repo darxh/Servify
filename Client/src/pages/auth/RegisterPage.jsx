@@ -1,16 +1,14 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import apiClient from "../../lib/axios"; // Direct axios call for registration
-import { useAuth } from "../../context/AuthContext";
+import apiClient from "../../lib/axios";
 import { Loader2, Mail, Lock, User, ArrowLeft, Briefcase } from "lucide-react";
-import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // We'll auto-login after register
   const { register, handleSubmit, setError, setValue, watch, formState: { errors, isSubmitting } } = useForm({
     defaultValues: {
-      role: "user" // Default role
+      role: "user"
     }
   });
 
@@ -18,24 +16,31 @@ const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      // Register
+      // Register (Backend sends email)
       await apiClient.post("/auth/register", data);
       
-      // Auto Login
-      await login({ email: data.email, password: data.password });
+      // Success Popup
+      toast.success("Account created! Please check your email to verify.", {
+        duration: 5000,
+        position: "top-center",
+      });
       
-      // Redirect based on role
-      navigate(data.role === 'provider' ? '/dashboard' : '/');
+      setTimeout(() => {
+        navigate("/auth/login");
+      }, 2000);
       
     } catch (error) {
       setError("root", { 
         message: error.response?.data?.message || "Registration failed. Try again." 
       });
+      toast.error(error.response?.data?.message || "Registration failed.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 py-12">
+      <Toaster />
+      
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
         
         {/* Header */}
@@ -133,14 +138,12 @@ const RegisterPage = () => {
             {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
           </div>
 
-          {/* Global Error */}
           {errors.root && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
               {errors.root.message}
             </div>
           )}
 
-          {/* Submit Button */}
           <button 
             type="submit" 
             disabled={isSubmitting}
@@ -151,7 +154,6 @@ const RegisterPage = () => {
 
         </form>
 
-        {/* Footer */}
         <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{" "}
           <Link to="/auth/login" className="font-bold text-blue-600 hover:underline">
