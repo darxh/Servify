@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import apiClient from "../../lib/axios";
-import { Loader2, Mail, Lock, User, ArrowLeft, Briefcase } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowLeft, Briefcase, ShieldCheck } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 const RegisterPage = () => {
@@ -13,13 +13,14 @@ const RegisterPage = () => {
   });
 
   const currentRole = watch("role");
+  const password = watch("password");
 
   const onSubmit = async (data) => {
     try {
-      // Register (Backend sends email)
-      await apiClient.post("/auth/register", data);
+      const { confirmPassword, ...registerData } = data;
+
+      await apiClient.post("/auth/register", registerData);
       
-      // Success Popup
       toast.success("Account created! Please check your email to verify.", {
         duration: 5000,
         position: "top-center",
@@ -137,6 +138,30 @@ const RegisterPage = () => {
             </div>
             {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
           </div>
+
+          {/* --- NEW: Confirm Password --- */}
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1.5">Confirm Password</label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <ShieldCheck className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+              </div>
+              <input 
+                {...register("confirmPassword", { 
+                  required: "Please confirm your password",
+                  validate: (val) => {
+                    if (!val) { return "Please confirm your password"; }
+                    if (watch("password") !== val) { return "Passwords do not match"; }
+                  }
+                })}
+                type="password" 
+                placeholder="••••••••"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50/50 focus:bg-white"
+              />
+            </div>
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium">{errors.confirmPassword.message}</p>}
+          </div>
+          {/* ----------------------------- */}
 
           {errors.root && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
