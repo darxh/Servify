@@ -39,7 +39,7 @@ const GoogleLoginButton = () => {
                     theme="outline"
                     shape="pill"
                     size="large"
-                    width="350"
+                    width="100%"
                     text="continue_with"
                 />
             </div>
