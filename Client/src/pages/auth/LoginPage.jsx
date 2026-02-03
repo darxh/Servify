@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Loader2, Mail, Lock, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
+import GoogleLoginButton from "../../features/auth/components/GoogleLoginButton";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -109,6 +110,8 @@ const LoginPage = () => {
           </button>
 
         </form>
+
+        <GoogleLoginButton />
 
         <p className="mt-8 text-center text-sm text-gray-600">
           New to Servify?{" "}

@@ -3,6 +3,8 @@ const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
 const { verifyEmailTemplate } = require("../utils/emailTemplates");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @desc    Register new user & Send Verification Email
 // @route   POST /api/v1/auth/register
@@ -91,6 +93,144 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+// const googleLogin = async (req, res) => {
+
+//   try {
+//     const { token } = req.body;
+
+//     const ticket = await client.verifyIdToken({
+//       idToken: token,
+//       audience: process.env.GOOGLE_CLIENT_ID,
+//     })
+
+//     const { name, email, picture, email_verified } = ticket.getPayload();
+
+//     if (!email_verified) {
+//       return res.status(400).json({
+//         message: "Google email is not verified."
+//       })
+//     }
+
+//     let user = await User.findOne({ email });
+
+//     if (user) {
+//       const accessToken = generateToken(res, user._id);
+
+//       if (!email_verified) {
+//         user.isVerified = true,
+//           await user.save();
+//       }
+
+//       res.json({
+//         _id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//         profileImage: user.profileImage,
+//         accessToken,
+//       });
+//     } else {
+//       const randomPassword = crypto.randomBytes(16).toString("hex");
+
+//       user = await User.create({
+//         name: name,
+//         email: email,
+//         password: randomPassword,
+//         profileImage: picture,
+//         isVerified: true,
+//         role: "user",
+//       });
+
+//       const accessToken = generateToken(res, user._id);
+
+//       res.status(201).json({
+//         _id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//         profileImage: user.profileImage,
+//         accessToken,
+//       });
+//     }
+//   } catch (error) {
+//     console.log("Google Auth Error:", error);
+//     res.status(400).json({ message: "Google Authentication Failed" });
+//   }
+// }
+
+// @desc    Login with Google
+// @route   POST /api/v1/auth/google
+const googleLogin = async (req, res) => {
+  console.log("\n---------- BACKEND SPY STARTED ----------"); // \n makes a new line
+  try {
+    const { token } = req.body;
+    console.log("1. Backend received token:", token ? "YES (Token received)" : "NO (Token is empty!)");
+ 
+    console.log("2. Verifying using Client ID:", process.env.GOOGLE_CLIENT_ID);
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { name, email, picture, email_verified } = ticket.getPayload();
+    console.log(`3. Google Verification SUCCESS! User is: ${email}`);
+
+    if (!email_verified) {
+      console.log("4. FAILED: Email not verified by Google");
+      return res.status(400).json({ message: "Google email is not verified." });
+    }
+
+    // Check DB
+    let user = await User.findOne({ email });
+    console.log("5. User found in DB?", user ? "YES" : "NO - Creating new user...");
+
+    if (user) {
+      const accessToken = generateToken(res, user._id);
+      if (!user.isVerified) {
+        user.isVerified = true;
+        await user.save();
+      }
+      console.log("6. Login Successful!");
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profileImage: user.profileImage,
+        accessToken,
+      });
+    } else {
+      // Create User
+      const randomPassword = crypto.randomBytes(16).toString("hex");
+      user = await User.create({
+        name: name,
+        email: email,
+        password: randomPassword,
+        profileImage: picture,
+        isVerified: true,
+        role: "user",
+      });
+      const accessToken = generateToken(res, user._id);
+      console.log("6. Registration Successful!");
+      res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profileImage: user.profileImage,
+        accessToken,
+      });
+    }
+
+  } catch (error) {
+    console.error("!!! BACKEND SPY ERROR !!!");
+    console.error("Error Message:", error.message);
+    res.status(400).json({ message: "Backend Error: " + error.message });
+  }
+};
+
+
 // @desc    Authenticate a user
 // @route   POST /api/v1/auth/login
 // @access  Public
@@ -100,10 +240,8 @@ const loginUser = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+password");
 
-    // Check password
     if (user && (await user.comparePassword(password))) {
 
-      // --- NEW CHECK: IS VERIFIED? ---
       if (!user.isVerified) {
         return res.status(401).json({ message: "Please verify your email first." });
       }
@@ -171,4 +309,4 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verifyEmail, loginUser, getMe, updateUserProfile };
+module.exports = { registerUser, verifyEmail, loginUser, googleLogin, getMe, updateUserProfile };

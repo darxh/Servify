@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import apiClient from "../../lib/axios";
 import { Loader2, Mail, Lock, User, ArrowLeft, Briefcase, ShieldCheck } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import GoogleLoginButton from "../../features/auth/components/GoogleLoginButton";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -139,7 +140,6 @@ const RegisterPage = () => {
             {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password.message}</p>}
           </div>
 
-          {/* --- NEW: Confirm Password --- */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1.5">Confirm Password</label>
             <div className="relative group">
@@ -161,7 +161,6 @@ const RegisterPage = () => {
             </div>
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 font-medium">{errors.confirmPassword.message}</p>}
           </div>
-          {/* ----------------------------- */}
 
           {errors.root && (
             <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-medium text-center">
@@ -178,6 +177,7 @@ const RegisterPage = () => {
           </button>
 
         </form>
+        <GoogleLoginButton />
 
         <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{" "}
