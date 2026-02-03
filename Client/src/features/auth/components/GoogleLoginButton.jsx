@@ -41,6 +41,7 @@ const GoogleLoginButton = () => {
                     size="large"
                     width="100%"
                     text="continue_with"
+                    logo_alignment="center"
                 />
             </div>
         </div>
