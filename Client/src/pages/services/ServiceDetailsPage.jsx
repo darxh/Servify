@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useService } from "../../hooks/useService";
 import { useAuth } from "../../context/AuthContext";
 import BookingModal from "../../features/bookings/components/BookingModal";
+import { formatINR } from "../../utils/formatCurrency";
 import {
   Star, MapPin, Share2, Heart, Grid,
   Shield, CheckCircle, User
@@ -58,25 +59,23 @@ const ServiceDetailsPage = () => {
   const isProvider = user?._id === service.provider?._id;
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'long',
     });
   };
 
+  const platformFee = 50;
+
   return (
     <div className="bg-white min-h-screen pb-20 font-sans">
-
       <div className="max-w-6xl mx-auto px-6 lg:px-8 pt-8">
-
-        {/* Title & Actions */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
           <div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">
               {service.name}
             </h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 font-medium">
-
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-black text-black" />
                 <span className="text-black font-semibold">{averageRating}</span>
@@ -86,9 +85,7 @@ const ServiceDetailsPage = () => {
                   </span>
                 )}
               </div>
-
               <span className="hidden sm:inline text-gray-300">•</span>
-
               <span className="text-gray-800 underline">
                 {service.category?.name}
               </span>
@@ -132,10 +129,8 @@ const ServiceDetailsPage = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-16">
-
         {/* Details & Reviews */}
         <div className="lg:col-span-2">
-
           {/* Provider Info Bar  */}
           <div className="flex justify-between items-start pb-8 border-b border-gray-200">
             <div>
@@ -210,7 +205,6 @@ const ServiceDetailsPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                 {reviews.map((review) => (
                   <div key={review._id} className="space-y-4">
-
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-gray-100 border border-gray-200">
                         {review.user?.profileImage ? (
@@ -257,10 +251,9 @@ const ServiceDetailsPage = () => {
         <div className="lg:col-span-1">
           <div className="sticky top-28">
             <div className="bg-white rounded-2xl shadow-[0_6px_16px_rgba(0,0,0,0.12)] border border-gray-200 p-6">
-
               <div className="flex justify-between items-end mb-6">
                 <div>
-                  <span className="text-2xl font-bold text-gray-900">${service.price}</span>
+                  <span className="text-2xl font-bold text-gray-900">{formatINR(service.price)}</span>
                   <span className="text-gray-500"> / service</span>
                 </div>
                 <div className="flex items-center gap-1 text-sm font-semibold text-gray-900">
@@ -310,18 +303,17 @@ const ServiceDetailsPage = () => {
               <div className="mt-6 space-y-3 pt-6 border-t border-gray-100 text-sm text-gray-600">
                 <div className="flex justify-between">
                   <span className="underline decoration-gray-300">Service Fee</span>
-                  <span>${service.price}</span>
+                  <span>{formatINR(service.price)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="underline decoration-gray-300">Platform Fee</span>
-                  <span>$2</span>
+                  <span>{formatINR(platformFee)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-gray-900 text-base pt-4 border-t border-gray-200">
                   <span>Total</span>
-                  <span>${service.price + 2}</span>
+                  <span>{formatINR(service.price + platformFee)}</span>
                 </div>
               </div>
-
             </div>
           </div>
         </div>

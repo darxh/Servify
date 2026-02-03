@@ -4,6 +4,7 @@ import { useServices } from "../../hooks/useServices";
 import { useDeleteService } from "../../hooks/useDeleteService";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
+import { formatINR } from "../../utils/formatCurrency";
 
 const MyServicesPage = () => {
   const { user } = useAuth();
@@ -81,7 +82,7 @@ const MyServicesPage = () => {
               
               {/* Price Tag */}
               <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
-                 ${service.price}
+              {formatINR(service.price)}
               </div>
             </div>
 

@@ -9,6 +9,7 @@ import {
   AlertTriangle, MessageSquare, Briefcase, ShoppingBag
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { formatINR } from "../../utils/formatCurrency";
 
 const MyBookingsPage = () => {
   const { user } = useAuth();
@@ -173,7 +174,7 @@ const MyBookingsPage = () => {
 
                   {/* Action Bar */}
                   <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-                    <span className="font-bold text-lg text-gray-900">${booking.price}</span>
+                    <span className="font-bold text-lg text-gray-900">{formatINR(booking.price)}</span>
 
                     <div className="flex gap-2">
 

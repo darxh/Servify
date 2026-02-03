@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useServices } from "../../hooks/useServices";
 import ServiceFilter from "../../features/services/components/ServiceFilter";
-import { MapPin, Clock, Filter, X, Star, ArrowLeft } from "lucide-react"; // [Added ArrowLeft]
+import { MapPin, Clock, Filter, X, Star, ArrowLeft } from "lucide-react";
+import { formatINR } from "../../utils/formatCurrency";
 
 const ServicesPage = () => {
   const [searchParams] = useSearchParams();
@@ -38,7 +39,7 @@ const ServicesPage = () => {
   return (
     <div className="bg-white min-h-screen pb-20">
       
-      {/*   Page Header  */}
+      {/* Page Header */}
       <div className="bg-gray-50 border-b border-gray-200 pt-8 pb-12">
          <div className="max-w-7xl mx-auto px-6 lg:px-8">
              
@@ -137,7 +138,7 @@ const ServicesPage = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-gray-900 shadow-sm">
-                        ${service.price}
+                        {formatINR(service.price)}
                       </div>
                     </div>
                     

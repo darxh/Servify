@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { X, Clock, Calendar } from "lucide-react";
 import { useCreateBooking } from "../../../hooks/useCreateBooking";
+import { formatINR } from "../../../utils/formatCurrency";
 
 const BookingModal = ({ serviceId, serviceName, price, onClose }) => {
   const {
@@ -96,7 +97,7 @@ const BookingModal = ({ serviceId, serviceName, price, onClose }) => {
           <div className="pt-4 border-t border-gray-100 mt-6">
             <div className="flex justify-between items-center mb-6">
                <span className="text-gray-500 font-medium">Total Price</span>
-               <span className="text-2xl font-bold text-gray-900">${price}</span>
+               <span className="text-2xl font-bold text-gray-900">{formatINR(price)}</span>
             </div>
             
             <button

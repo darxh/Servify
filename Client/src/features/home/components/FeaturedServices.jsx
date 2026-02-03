@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { useServices } from "../../../hooks/useServices";
 import { Star, MapPin, ChevronLeft, ChevronRight, ArrowRight, User } from "lucide-react";
+import { formatINR } from "../../../utils/formatCurrency";
 
 const FeaturedServices = () => { 
   const { data: services = [], isLoading, isError } = useServices(); 
@@ -90,7 +91,7 @@ const FeaturedServices = () => {
                       className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm border border-white/50">
-                      ${service.price}
+                    {formatINR(service.price)}
                     </div>
                     <div className="absolute top-3 left-3 bg-blue-600/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">
                       {service.category?.name || "Service"}
