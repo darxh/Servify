@@ -106,7 +106,6 @@ const googleLogin = async (req, res) => {
     });
 
     const { name, email, picture, email_verified } = ticket.getPayload();
-    console.log(`3. Google Verification SUCCESS! User is: ${email}`);
 
     if (!email_verified) {
       return res.status(400).json({ message: "Google email is not verified." });

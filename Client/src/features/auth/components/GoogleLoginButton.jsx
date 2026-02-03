@@ -32,7 +32,8 @@ const GoogleLoginButton = () => {
                 </div>
             </div>
 
-            <div className="w-full transition-transform active:scale-[0.98]">
+            {/* <div className="w-full transition-transform active:scale-[0.98]"> */}
+            <div className="w-full flex justify-center h-[44px]">
                 <GoogleLogin
                     onSuccess={handleSuccess}
                     onError={handleError}
