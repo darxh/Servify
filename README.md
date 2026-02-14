@@ -33,7 +33,7 @@
 
 Built to demonstrate scalable backend logic using **Express 5** and a responsive modern frontend powered by **React 19** and **Vite**.
 
-![Servify Preview](https://github.com/darxh/Servify/blob/main/Client/src/assets/preview.png)
+![Servify Preview](https://i.postimg.cc/3Rpn3SkY/Screenshot-2026-02-05-230352.png)
 
 ---
 
