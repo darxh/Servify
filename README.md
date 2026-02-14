@@ -4,7 +4,6 @@
 
 The platform features robust role-based access control, real-time booking management, secure authentication with Google OAuth, and an intuitive interface for both service providers and customers.
 
-
 ![Servify Preview](https://i.postimg.cc/SNBHWS9c/Screenshot-2026-02-02-213229.png)
 
 ## Key Features
@@ -160,63 +159,49 @@ Open your browser and navigate to:
 
 ```
 Servify/
-├── Client/                     # React Frontend Application
+├── Client/                       # React Frontend (Vite)
+│   ├── public/                   # Static assets
 │   ├── src/
-│   │   ├── features/          # Feature-based architecture
-│   │   │   ├── auth/          # Authentication components
-│   │   │   ├── services/      # Service listing & management
-│   │   │   └── bookings/      # Booking system
-│   │   ├── hooks/             # Custom React hooks
-│   │   │   ├── useCreateBooking.js
-│   │   │   ├── useAuth.js
-│   │   │   └── ...
-│   │   ├── layouts/           # Layout components
-│   │   │   ├── DashboardLayout.jsx
-│   │   │   └── MainLayout.jsx
-│   │   ├── pages/             # Full page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── Services.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   └── ...
-│   │   ├── context/           # React Context providers
-│   │   │   └── AuthContext.jsx
-│   │   ├── utils/             # Utility functions
-│   │   └── App.jsx            # Main application component
-│   ├── public/                # Static assets
-│   ├── package.json
-│   └── vite.config.js
+│   │   ├── context/              # Global state management (AuthContext)
+│   │   ├── features/             # Feature-based UI components
+│   │   │   ├── auth/             # Forms and OAuth buttons
+│   │   │   ├── bookings/         # Booking modals and logic
+│   │   │   ├── home/             # Landing page sections (Hero, Categories, etc.)
+│   │   │   ├── reviews/          # Review modals
+│   │   │   └── services/         # Search & filtering components
+│   │   ├── hooks/                # Custom data fetching hooks (React Query)
+│   │   ├── layouts/              # UI Layouts (AuthLayout, MainLayout, Dashboard/Sidebar)
+│   │   ├── lib/                  # Third-party configurations (Axios instance)
+│   │   ├── pages/                # Application routes
+│   │   │   ├── auth/             # LoginPage, RegisterPage
+│   │   │   ├── dashboard/        # Provider/User Dashboard, Settings, Create/Edit Services
+│   │   │   ├── home/             # HomePage
+│   │   │   └── services/         # ServicesPage, ServiceDetailsPage
+│   │   ├── utils/                # Helper functions (formatCurrency)
+│   │   ├── main.jsx              # React application entry point
+│   │   └── router.jsx            # Application routing (React Router)
+│   ├── index.html                # HTML entry point
+│   └── vite.config.js            # Vite configuration
 │
-├── Server/                     # Express Backend Application
-│   ├── config/                # Configuration files
-│   │   ├── db.js              # MongoDB connection
-│   │   └── cloudinary.js      # Cloudinary setup
-│   ├── controllers/           # Route controllers
-│   │   ├── authController.js
-│   │   ├── serviceController.js
-│   │   ├── bookingController.js
-│   │   └── userController.js
-│   ├── middleware/            # Express middleware
-│   │   ├── authMiddleware.js  # JWT verification
-│   │   ├── errorHandler.js    # Error handling
-│   │   └── roleCheck.js       # Role-based access
-│   ├── models/                # Mongoose schemas
-│   │   ├── User.js
-│   │   ├── Service.js
-│   │   ├── Booking.js
-│   │   └── Review.js
-│   ├── routes/                # API routes
-│   │   ├── authRoutes.js
-│   │   ├── serviceRoutes.js
-│   │   ├── bookingRoutes.js
-│   │   └── userRoutes.js
-│   ├── utils/                 # Utility functions
-│   │   ├── emailService.js
-│   │   ├── tokenUtils.js
-│   │   └── validators.js
-│   ├── server.js              # Main server file
-│   └── package.json
-│
-└── README.md                   # Project documentation
+└── Server/                       # Node.js & Express Backend
+    ├── config/                   # Database (db.js) & Cloudinary configurations
+    ├── controllers/              # Business logic handling
+    │   ├── authController.js     
+    │   ├── bookingController.js  
+    │   ├── categoryController.js 
+    │   ├── reviewController.js   
+    │   └── serviceController.js  
+    ├── middleware/               # Custom Express middlewares (authMiddleware.js)
+    ├── models/                   # Mongoose Database Schemas
+    │   ├── bookingModel.js
+    │   ├── categoryModel.js
+    │   ├── reviewModel.js
+    │   ├── serviceModel.js
+    │   └── userModel.js
+    ├── routes/                   # API route definitions
+    ├── utils/                    # Helper functions (emailTemplates, generateToken, sendEmail)
+    ├── seed.js                   # Database seeding script
+    └── server.js                 # Backend entry point
 ```
 <!--
 ---
