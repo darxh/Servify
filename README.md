@@ -218,7 +218,7 @@ Servify/
 │
 └── README.md                   # Project documentation
 ```
-
+<!--
 ---
 
 ## API Endpoints
@@ -347,6 +347,7 @@ npm test
 4. Configure redirects for SPA routing
 
 ---
+-->
 
 ## Contributing
 
