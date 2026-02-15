@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useService } from "../../hooks/useService";
 import { useAuth } from "../../context/AuthContext";
 import BookingModal from "../../features/bookings/components/BookingModal";
 import { formatINR } from "../../utils/formatCurrency";
 import {
   Star, MapPin, Share2, Heart, Grid,
-  Shield, CheckCircle, User
+  Shield, CheckCircle, User, ArrowLeft 
 } from "lucide-react";
 
 const ServiceDetailsPage = () => {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate(); 
 
   const { data: service, isLoading, isError } = useService(id);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -70,6 +71,14 @@ const ServiceDetailsPage = () => {
   return (
     <div className="bg-white min-h-screen pb-20 font-sans">
       <div className="max-w-6xl mx-auto px-6 lg:px-8 pt-8">
+         
+        <button 
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 mb-6 transition-colors"
+        >
+          <ArrowLeft size={18} /> Back
+        </button>
+
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
           <div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">
@@ -89,17 +98,32 @@ const ServiceDetailsPage = () => {
               <span className="text-gray-800 underline">
                 {service.category?.name}
               </span>
+               
+              {service.address && (
+                <>
+                  <span className="hidden sm:inline text-gray-300">•</span>
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(service.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 font-semibold text-gray-800 underline decoration-gray-300 hover:text-blue-600 transition-colors underline-offset-4 cursor-pointer"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    <span>{service.address}</span>
+                  </a>
+                </>
+              )}
             </div>
           </div>
 
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition text-sm font-semibold underline decoration-gray-300 underline-offset-4">
               <Share2 className="h-4 w-4" /> Share
             </button>
             <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded-lg transition text-sm font-semibold underline decoration-gray-300 underline-offset-4">
               <Heart className="h-4 w-4" /> Save
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Image Gallery */}
@@ -129,8 +153,10 @@ const ServiceDetailsPage = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-16">
+        
         {/* Details & Reviews */}
         <div className="lg:col-span-2">
+          
           {/* Provider Info Bar  */}
           <div className="flex justify-between items-start pb-8 border-b border-gray-200">
             <div>
@@ -273,10 +299,20 @@ const ServiceDetailsPage = () => {
                     <span className="text-sm text-gray-900 truncate block">{service.category?.name}</span>
                   </div>
                 </div>
-                <div className="p-3 bg-gray-50/50">
+                <div className={`p-3 bg-gray-50/50 ${service.address ? 'border-b border-gray-300' : ''}`}>
                   <label className="block text-[10px] font-extrabold uppercase text-gray-700 tracking-wider">Provider</label>
                   <span className="text-sm text-gray-900">{service.provider?.name}</span>
                 </div>
+                {service.address && (
+                  <div className="p-3 bg-white">
+                    <label className="block text-[10px] font-extrabold uppercase text-gray-700 tracking-wider flex items-center gap-1">
+                      <MapPin size={10} /> Location
+                    </label>
+                    <span className="text-sm text-gray-900 truncate block" title={service.address}>
+                      {service.address}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Buttons */}
@@ -300,7 +336,7 @@ const ServiceDetailsPage = () => {
                 <p className="text-xs text-gray-500">You won't be charged yet</p>
               </div>
 
-              <div className="mt-6 space-y-3 pt-6 border-t border-gray-100 text-sm text-gray-600">
+              {/* <div className="mt-6 space-y-3 pt-6 border-t border-gray-100 text-sm text-gray-600">
                 <div className="flex justify-between">
                   <span className="underline decoration-gray-300">Service Fee</span>
                   <span>{formatINR(service.price)}</span>
@@ -313,7 +349,30 @@ const ServiceDetailsPage = () => {
                   <span>Total</span>
                   <span>{formatINR(service.price + platformFee)}</span>
                 </div>
+              </div> */}
+              <div className="mt-6 space-y-3 pt-6 border-t border-gray-100 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span className="underline decoration-gray-300">Service Fee</span>
+                  <span>{formatINR(service.price)}</span>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <span className="underline decoration-gray-300">Platform Fee</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">Waived</span>
+                    <span className="line-through text-gray-400">{formatINR(platformFee)}</span>
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-end font-bold text-gray-900 pt-4 border-t border-gray-200">
+                  <div className="flex flex-col">
+                     <span className="text-base">Total</span>
+                     <span className="text-xs font-normal text-gray-500 italic mt-0.5">(Pay provider directly)</span>
+                  </div>
+                  <span className="text-lg">{formatINR(service.price)}</span>
+                </div>
               </div>
+
             </div>
           </div>
         </div>
