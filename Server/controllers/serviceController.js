@@ -6,12 +6,8 @@ const Booking = require("../models/bookingModel");
 // @route   POST /api/v1/services
 // @access  Private (Provider)
 const createService = async (req, res) => {
-
-  // console.log("Create Service Request Body:", req.body);
-  // console.log("Create Service Request File:", req.file);
-
-  try {
-    const { name, description, price, duration, category } = req.body;
+  try { 
+    const { name, description, price, duration, category, address, lat, lng } = req.body;
 
     let imagePaths = [];
     if (req.files && req.files.length > 0) {
@@ -21,6 +17,14 @@ const createService = async (req, res) => {
     const categoryExists = await Category.findById(category);
     if (!categoryExists) {
       return res.status(400).json({ message: "Invalid category Id" });
+    }
+ 
+    let locationObject = undefined;
+    if (lat && lng) {
+      locationObject = {
+        type: "Point",
+        coordinates: [Number(lng), Number(lat)],
+      };
     }
 
     const service = await Service.create({
@@ -32,6 +36,8 @@ const createService = async (req, res) => {
       price,
       duration,
       images: imagePaths,
+      address, 
+      location: locationObject 
     });
 
     res.status(201).json(service);
@@ -40,12 +46,12 @@ const createService = async (req, res) => {
   }
 };
 
-// @desc    Get all services (with Search & Filter)
+// @desc    Get all services (with Search & Filter & Location)
 // @route   GET /api/v1/services
 // @access  Public
 const getAllServices = async (req, res) => {
   try {
-    const { keyword, category, minPrice, maxPrice, sort } = req.query;
+    const { keyword, category, minPrice, maxPrice, sort, lat, lng, radius } = req.query;
 
     const keywordFilter = keyword
       ? {
@@ -67,19 +73,41 @@ const getAllServices = async (req, res) => {
       if (minPrice) filters.price.$gte = Number(minPrice);
       if (maxPrice) filters.price.$lte = Number(maxPrice);
     }
-
-    let sortOption = { createdAt: -1 };
-    if (sort === "price-asc") {
-      sortOption = { price: 1 };
-    } else if (sort === "price-desc") {
-      sortOption = { price: -1 };
+ 
+    if (lat && lng) {
+      const radiusInMeters = radius ? Number(radius) * 1000 : 50000; 
+      filters.location = {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [Number(lng), Number(lat)],
+          },
+          $maxDistance: radiusInMeters,
+        },
+      };
+    }
+    
+    let sortOption = {}; 
+    if (!lat || !lng) {
+      sortOption = { createdAt: -1 }; 
+      if (sort === "price-asc") {
+        sortOption = { price: 1 };
+      } else if (sort === "price-desc") {
+        sortOption = { price: -1 };
+      }
     }
 
-    const services = await Service.find(filters)
-    .populate("category", "name slug")
-    .populate("provider", "name email profileImage")
-    .populate("reviews") 
-    .sort(sortOption);
+    // Execute query
+    let query = Service.find(filters)
+      .populate("category", "name slug")
+      .populate("provider", "name email profileImage")
+      .populate("reviews");
+     
+    if (Object.keys(sortOption).length > 0) {
+      query = query.sort(sortOption);
+    }
+
+    const services = await query.exec();
 
     res.json({ count: services.length, services });
   } catch (error) {
@@ -113,8 +141,8 @@ const getServiceById = async (req, res) => {
 // @route   PUT /api/v1/services/:id
 // @access  Private (Provider)
 const updateService = async (req, res) => {
-  try {
-    const { name, description, price, duration, category } = req.body;
+  try { 
+    const { name, description, price, duration, category, address, lat, lng } = req.body;
     const service = await Service.findById(req.params.id);
 
     if (!service) return res.status(404).json({ message: "Service not found" });
@@ -128,10 +156,14 @@ const updateService = async (req, res) => {
     service.price = price || service.price;
     service.duration = duration || service.duration;
     service.category = category || service.category;
+    service.address = address || service.address;
+    if (lat && lng) {
+      service.location = {
+        type: "Point",
+        coordinates: [Number(lng), Number(lat)]
+      };
+    }
 
-    // if (req.files && req.files.length > 0) {
-    //   service.images = req.files.map((file) => file.path);
-    // }
     if (req.files && req.files.length > 0) {
       const newImagePaths = req.files.map((file) => file.path);
       service.images = [...(service.images || []), ...newImagePaths];

@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useServices } from "../../hooks/useServices";
 import ServiceFilter from "../../features/services/components/ServiceFilter";
 import { MapPin, Clock, Filter, X, Star, ArrowLeft } from "lucide-react";
-import { formatINR } from "../../utils/formatCurrency";
+import { formatINR } from "../../utils/formatCurrency"; 
 
 const ServicesPage = () => {
   const [searchParams] = useSearchParams();
@@ -11,13 +11,16 @@ const ServicesPage = () => {
   
   const initialKeyword = searchParams.get("keyword") || "";
   const initialCategory = searchParams.get("category") || "";
-
+ 
   const [filters, setFilters] = useState({
     keyword: initialKeyword,
     category: initialCategory,
     minPrice: "",
     maxPrice: "",
     sort: "newest",
+    lat: "",
+    lng: "",
+    radius: 50 
   });
 
   useEffect(() => {
@@ -117,7 +120,7 @@ const ServicesPage = () => {
                   We couldn't find any matches. <br/> Try adjusting your filters.
                 </p>
                 <button 
-                  onClick={() => setFilters({ keyword: "", category: "", minPrice: "", maxPrice: "", sort: "newest" })}
+                  onClick={() => setFilters({ keyword: "", category: "", minPrice: "", maxPrice: "", sort: "newest", lat: "", lng: "", radius: 50 })}
                   className="mt-6 px-6 py-2.5 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition shadow-lg"
                 >
                   Clear All Filters
@@ -138,7 +141,7 @@ const ServicesPage = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-gray-900 shadow-sm">
-                        {formatINR(service.price)}
+                      ₹{service.price}
                       </div>
                     </div>
                     
@@ -163,7 +166,9 @@ const ServicesPage = () => {
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto text-sm text-gray-500">
                          <div className="flex items-center gap-1.5">
                             <MapPin size={14} className="text-gray-400" />
-                            <span className="truncate max-w-[100px]">{service.provider?.name}</span>
+                            <span className="truncate max-w-[100px]"> 
+                              {service.address ? service.address.split(',')[0] : service.provider?.name}
+                            </span>
                          </div>
                          <div className="flex items-center gap-1.5">
                             <Clock size={14} className="text-gray-400" />
