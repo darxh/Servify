@@ -6,7 +6,7 @@ import { useUpdateBooking } from "../../hooks/useUpdateBooking";
 import ReviewModal from "../../features/reviews/components/ReviewModal";
 import {
   Calendar, MapPin, Clock, User, CheckCircle, XCircle,
-  AlertTriangle, MessageSquare, Briefcase, ShoppingBag
+  MessageSquare, Briefcase, ShoppingBag
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatINR } from "../../utils/formatCurrency";
@@ -108,7 +108,12 @@ const MyBookingsPage = () => {
             </p>
           </div>
         ) : (
-          (activeTab === "customer" ? customerBookings : providerBookings).map((booking) => (
+          (activeTab === "customer" ? customerBookings : providerBookings).map((booking) => {
+            
+            const displayPrice = booking.price || booking.service?.price;
+            const displayAddress = booking.service?.address || booking.address;
+
+            return (
             <div
               key={booking._id}
               className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all group"
@@ -148,33 +153,49 @@ const MyBookingsPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-gray-400" />
-                      <span className="font-medium">
-                        {new Date(booking.bookingDate).toLocaleDateString(undefined, {
-                          month: 'short', day: 'numeric', year: 'numeric'
-                        })}
-                        <span className="text-gray-400 mx-1">at</span>
-                        {new Date(booking.bookingDate).toLocaleTimeString([], {
-                          hour: '2-digit', minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 mt-4 text-sm text-gray-600">
+                      
+                      <div className="flex items-center gap-2">
+                        <Calendar size={16} className="text-gray-400 shrink-0" />
+                        <span className="font-medium">
+                          {new Date(booking.bookingDate).toLocaleDateString(undefined, {
+                            month: 'short', day: 'numeric', year: 'numeric'
+                          })}
+                          <span className="text-gray-400 mx-1">at</span>
+                          {new Date(booking.bookingDate).toLocaleTimeString([], {
+                            hour: '2-digit', minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center gap-2">
-                      <Clock size={16} className="text-gray-400" />
-                      <span>{booking.service?.duration || 60} mins</span>
-                    </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={16} className="text-gray-400 shrink-0" />
+                        <span>{booking.service?.duration || 60} mins</span>
+                      </div>
 
-                    <div className="flex items-center gap-2 col-span-2 md:col-span-1">
-                      <MapPin size={16} className="text-gray-400" />
-                      <span className="truncate max-w-[150px]">{booking.address}</span>
+                      <div className="flex items-center gap-2 sm:col-span-2">
+                        <MapPin size={16} className="text-gray-400 shrink-0" />
+                        {displayAddress ? (
+                          <a 
+                            href={`https://maps.google.com/?q=${encodeURIComponent(displayAddress)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="truncate max-w-[300px] text-gray-700 hover:text-blue-600 hover:underline transition-colors"
+                            title={displayAddress}
+                          >
+                            {displayAddress}
+                          </a>
+                        ) : (
+                          <span className="italic text-gray-400">Location not provided</span>
+                        )}
+                      </div>
+
                     </div>
                   </div>
 
-                  {/* Action Bar */}
                   <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-                    <span className="font-bold text-lg text-gray-900">{formatINR(booking.price)}</span>
+                    
+                    <span className="font-bold text-xl text-gray-900">{formatINR(displayPrice)}</span>
 
                     <div className="flex gap-2">
 
@@ -236,7 +257,6 @@ const MyBookingsPage = () => {
                         </>
                       )}
 
-                      {/* Common: View Service */}
                       <Link
                         to={`/services/${booking.service?._id}`}
                         className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition"
@@ -249,7 +269,7 @@ const MyBookingsPage = () => {
 
               </div>
             </div>
-          ))
+          )})
         )}
       </div>
 
