@@ -3,15 +3,15 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useServices } from "../../hooks/useServices";
 import ServiceFilter from "../../features/services/components/ServiceFilter";
 import { MapPin, Clock, Filter, X, Star, ArrowLeft } from "lucide-react";
-import { formatINR } from "../../utils/formatCurrency"; 
+import { formatINR } from "../../utils/formatCurrency";
 
 const ServicesPage = () => {
   const [searchParams] = useSearchParams();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  
+
   const initialKeyword = searchParams.get("keyword") || "";
   const initialCategory = searchParams.get("category") || "";
- 
+
   const [filters, setFilters] = useState({
     keyword: initialKeyword,
     category: initialCategory,
@@ -20,7 +20,7 @@ const ServicesPage = () => {
     sort: "newest",
     lat: "",
     lng: "",
-    radius: 50 
+    radius: 50
   });
 
   useEffect(() => {
@@ -41,32 +41,32 @@ const ServicesPage = () => {
 
   return (
     <div className="bg-white min-h-screen pb-20">
-      
+
       {/* Page Header */}
       <div className="bg-gray-50 border-b border-gray-200 pt-8 pb-12">
-         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-             
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 mb-6 transition-colors"
-            >
-              <ArrowLeft size={18} /> Back to Home
-            </Link>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
-            <h1 className="text-3xl font-bold text-gray-900">Explore Services</h1>
-            <p className="mt-2 text-lg text-gray-600 max-w-2xl">
-              {filters.keyword 
-                ? `Showing results for "${filters.keyword}"`
-                : "Find the best professionals for your needs, from cleaning to repairs."}
-            </p>
-         </div>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 mb-6 transition-colors"
+          >
+            <ArrowLeft size={18} /> Back to Home
+          </Link>
+
+          <h1 className="text-3xl font-bold text-gray-900">Explore Services</h1>
+          <p className="mt-2 text-lg text-gray-600 max-w-2xl">
+            {filters.keyword
+              ? `Showing results for "${filters.keyword}"`
+              : "Find the best professionals for your needs, from cleaning to repairs."}
+          </p>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-        
+
         {/* Mob Filter Toggle */}
         <div className="lg:hidden mb-6">
-          <button 
+          <button
             onClick={() => setShowMobileFilters(true)}
             className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 rounded-xl font-semibold shadow-sm text-gray-700 hover:bg-gray-50 transition"
           >
@@ -81,20 +81,20 @@ const ServicesPage = () => {
             lg:w-64 flex-shrink-0
             ${showMobileFilters ? "fixed inset-0 z-50 bg-white p-6 overflow-y-auto" : "hidden lg:block"}
           `}>
-             <div className="flex justify-between items-center lg:hidden mb-6">
-                <span className="font-bold text-lg">Filters</span>
-                <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                  <X size={20} />
-                </button>
-             </div>
-             
-             <div className="lg:sticky lg:top-24">
-                <ServiceFilter 
-                  filters={filters} 
-                  setFilters={setFilters} 
-                  onClose={() => setShowMobileFilters(false)} 
-                />
-             </div>
+            <div className="flex justify-between items-center lg:hidden mb-6">
+              <span className="font-bold text-lg">Filters</span>
+              <button onClick={() => setShowMobileFilters(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="lg:sticky lg:top-24">
+              <ServiceFilter
+                filters={filters}
+                setFilters={setFilters}
+                onClose={() => setShowMobileFilters(false)}
+              />
+            </div>
           </aside>
 
           {/* main results grid */}
@@ -117,9 +117,9 @@ const ServicesPage = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">No services found</h3>
                 <p className="mt-2 text-gray-500">
-                  We couldn't find any matches. <br/> Try adjusting your filters.
+                  We couldn't find any matches. <br /> Try adjusting your filters.
                 </p>
-                <button 
+                <button
                   onClick={() => setFilters({ keyword: "", category: "", minPrice: "", maxPrice: "", sort: "newest", lat: "", lng: "", radius: 50 })}
                   className="mt-6 px-6 py-2.5 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition shadow-lg"
                 >
@@ -129,51 +129,54 @@ const ServicesPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {services.map((service) => (
-                  <Link 
-                    key={service._id} 
+                  <Link
+                    key={service._id}
                     to={`/services/${service._id}`}
                     className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full"
                   >
                     <div className="relative h-48 bg-gray-200 overflow-hidden shrink-0">
-                      <img 
-                        src={getServiceImage(service)} 
+                      <img
+                        src={getServiceImage(service)}
                         alt={service.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-gray-900 shadow-sm">
-                      ₹{service.price}
+                        ₹{service.price}
                       </div>
                     </div>
-                    
+
                     <div className="p-5 flex flex-col flex-grow">
                       <div className="flex items-start justify-between mb-3">
-                         <span className="text-[10px] uppercase tracking-wider font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
-                           {service.category?.name || "General"}
-                         </span>
-                         <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded-md">
-                           <Star size={12} className="fill-orange-400 text-orange-400" /> 4.8
-                         </div>
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">
+                          {service.category?.name || "General"}
+                        </span>
+                        <div className="flex items-center gap-1 text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded-md">
+                          <Star size={12} className="fill-orange-400 text-orange-400" />
+                          {service.reviews?.length > 0
+                            ? (service.reviews.reduce((acc, rev) => acc + rev.rating, 0) / service.reviews.length).toFixed(1)
+                            : "New"}
+                        </div>
                       </div>
 
                       <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
                         {service.name}
                       </h3>
-                      
+
                       <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">
                         {service.description}
                       </p>
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto text-sm text-gray-500">
-                         <div className="flex items-center gap-1.5">
-                            <MapPin size={14} className="text-gray-400" />
-                            <span className="truncate max-w-[100px]"> 
-                              {service.address ? service.address.split(',')[0] : service.provider?.name}
-                            </span>
-                         </div>
-                         <div className="flex items-center gap-1.5">
-                            <Clock size={14} className="text-gray-400" />
-                            <span>{service.duration}m</span>
-                         </div>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin size={14} className="text-gray-400" />
+                          <span className="truncate max-w-[100px]">
+                            {service.address ? service.address.split(',')[0] : service.provider?.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={14} className="text-gray-400" />
+                          <span>{service.duration}m</span>
+                        </div>
                       </div>
                     </div>
                   </Link>

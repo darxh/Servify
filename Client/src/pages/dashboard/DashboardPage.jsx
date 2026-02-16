@@ -61,12 +61,12 @@ const DashboardPage = () => {
             <div className={`p-3 rounded-xl ${isProvider ? "bg-green-50 text-green-600" : "bg-blue-50 text-blue-600"}`}>
               <TrendingUp size={24} />
             </div>
-            {isProvider && <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>}
+            {/* {isProvider && <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-full">+12%</span>} */}
           </div>
           <p className="text-gray-500 text-sm font-medium mb-1">
             {isProvider ? "Total Earnings" : "Total Spent"}
           </p>
-          <h3 className="text-3xl font-bold text-gray-900">${totalMoney}</h3>
+          <h3 className="text-3xl font-bold text-gray-900">₹{totalMoney}</h3>
         </div>
 
         <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">

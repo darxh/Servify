@@ -76,7 +76,7 @@ const ServiceDetailsPage = () => {
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-blue-600 mb-6 transition-colors"
         >
-          <ArrowLeft size={18} /> Back
+          <ArrowLeft size={18} /> Back to Home
         </button>
 
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-6">
