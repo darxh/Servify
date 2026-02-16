@@ -1,14 +1,14 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext";
 import { useUpdateProfile } from "../../hooks/useUpdateProfile"; 
-import { User, Mail, Lock, Camera, Save, Loader2 } from "lucide-react";
+import { User, Mail, Lock, Camera, Save, Loader2, Phone } from "lucide-react"; 
 import { useState, useEffect } from "react";
 
 const SettingsPage = () => {
   const { user } = useAuth();
   const updateProfileMutation = useUpdateProfile();
   
-  const { register, handleSubmit, reset, formState: { isDirty } } = useForm();
+  const { register, handleSubmit, reset, formState: { isDirty, errors } } = useForm();
   
   const [preview, setPreview] = useState(user?.profileImage || null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -19,6 +19,7 @@ const SettingsPage = () => {
         name: user.name,
         email: user.email,
         bio: user.bio || "",
+        phoneNumber: user.phoneNumber || "", 
       });
       setPreview(user.profileImage);
     }
@@ -36,6 +37,7 @@ const SettingsPage = () => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("bio", data.bio);
+    formData.append("phoneNumber", data.phoneNumber); 
     
     if (data.password) {
       formData.append("password", data.password);
@@ -122,6 +124,25 @@ const SettingsPage = () => {
                     className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Mobile Number</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                  <input
+                    {...register("phoneNumber", {
+                      pattern: {
+                        value: /^[0-9+\-\s()]*$/,
+                        message: "Invalid phone number format"
+                      }
+                    })}
+                    type="tel"
+                    placeholder="+91 9876543210"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white"
+                  />
+                </div>
+                {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
               </div>
 
               <div>

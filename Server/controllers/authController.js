@@ -96,7 +96,6 @@ const verifyEmail = async (req, res) => {
 // @desc    Login with Google
 // @route   POST /api/v1/auth/google
 const googleLogin = async (req, res) => {
-
   try {
     const { token } = req.body;
 
@@ -125,10 +124,10 @@ const googleLogin = async (req, res) => {
         email: user.email,
         role: user.role,
         profileImage: user.profileImage,
+        phoneNumber: user.phoneNumber,
         accessToken,
       });
     } else {
-      // Create User
       const randomPassword = crypto.randomBytes(16).toString("hex");
       user = await User.create({
         name: name,
@@ -145,6 +144,7 @@ const googleLogin = async (req, res) => {
         email: user.email,
         role: user.role,
         profileImage: user.profileImage,
+        phoneNumber: user.phoneNumber,
         accessToken,
       });
     }
@@ -179,6 +179,7 @@ const loginUser = async (req, res) => {
         role: user.role,
         profileImage: user.profileImage,
         bio: user.bio,
+        phoneNumber: user.phoneNumber,
         accessToken: accessToken,
       });
     } else {
@@ -205,7 +206,11 @@ const updateUserProfile = async (req, res) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
-      user.bio = req.body.bio || user.bio;
+      user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+      
+      if (req.body.phoneNumber !== undefined) {
+        user.phoneNumber = req.body.phoneNumber;
+      }
 
       if (req.body.password) {
         user.password = req.body.password;
@@ -224,6 +229,7 @@ const updateUserProfile = async (req, res) => {
         role: updatedUser.role,
         profileImage: updatedUser.profileImage,
         bio: updatedUser.bio,
+        phoneNumber: updatedUser.phoneNumber,
       });
     } else {
       res.status(404).json({ message: "User not found" });

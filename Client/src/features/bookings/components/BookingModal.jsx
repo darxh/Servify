@@ -1,111 +1,165 @@
-import { useForm } from "react-hook-form";
-import { X, Clock, Calendar } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 import { useCreateBooking } from "../../../hooks/useCreateBooking";
 import { formatINR } from "../../../utils/formatCurrency";
+import { X, Calendar, Clock, MapPin, Phone, Loader2, AlertCircle } from "lucide-react";
 
-const BookingModal = ({ serviceId, serviceName, price, onClose }) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+const BookingModal = ({ isOpen, onClose, serviceId, price }) => {
+  const { user, updateUser } = useAuth();
+  const navigate = useNavigate();
+  const createBookingMutation = useCreateBooking();
 
-  const { mutate, isPending } = useCreateBooking();
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [address, setAddress] = useState("");
 
-  const onSubmit = (data) => {
-    const combinedDateTime = new Date(`${data.bookingDate}T${data.bookingTime}`);
-    
-    mutate({
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+
+  if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setPhoneError("");
+
+    if (!user?.phoneNumber && (!phoneNumber || phoneNumber.trim().length < 8)) {
+      setPhoneError("A valid mobile number is required so the provider can contact you.");
+      return;
+    }
+
+    const bookingDate = new Date(`${date}T${time}`).toISOString();
+
+    const bookingPayload = {
       serviceId,
-      bookingDate: combinedDateTime.toISOString(),
-      address: data.address,
-    }, {
+      bookingDate,
+      address,
+      phoneNumber: !user?.phoneNumber ? phoneNumber : undefined
+    };
+
+    createBookingMutation.mutate(bookingPayload, {
       onSuccess: () => {
-        onClose(); 
-        alert("Booking Confirmed! 🎉");
+        if (!user?.phoneNumber && phoneNumber) {
+          updateUser({ ...user, phoneNumber });
+        }
+
+        onClose();
+        navigate("/dashboard/bookings");
+      },
+      onError: (error) => {
+        setPhoneError(error.response?.data?.message || "Failed to create booking.");
       }
     });
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl relative">
-        <button
-          onClick={onClose}
-          className="absolute right-5 top-5 text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          <X size={24} />
-        </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+      <div
+        className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">Book Service</h2>
-        <p className="text-sm text-gray-500 mb-8">
-          Complete your booking for <span className="font-bold text-blue-600">{serviceName}</span>
-        </p>
+        <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Book Service</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Fill in the details to confirm your request.</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+
           <div className="grid grid-cols-2 gap-4">
-            {/* date input */}
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                Date
-              </label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-bold text-gray-700">Date</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 text-gray-400 h-5 w-5" />
+                <Calendar className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none" />
                 <input
                   type="date"
-                  min={new Date().toISOString().split("T")[0]} // Disable past dates
-                  {...register("bookingDate", { required: "Date is required" })}
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all font-medium text-gray-700"
+                  required
+                  min={new Date().toISOString().split('T')[0]}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white text-sm"
                 />
               </div>
-              {errors.bookingDate && <p className="text-red-500 text-xs mt-1 font-bold">{errors.bookingDate.message}</p>}
             </div>
 
-            {/* time input */}
-            <div>
-              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                Time
-              </label>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-bold text-gray-700">Time</label>
               <div className="relative">
-                <Clock className="absolute left-3 top-3 text-gray-400 h-5 w-5" />
+                <Clock className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none" />
                 <input
                   type="time"
-                  {...register("bookingTime", { required: "Time is required" })}
-                  className="w-full pl-10 pr-3 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all font-medium text-gray-700"
+                  required
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white text-sm"
                 />
               </div>
-              {errors.bookingTime && <p className="text-red-500 text-xs mt-1 font-bold">{errors.bookingTime.message}</p>}
             </div>
           </div>
 
-          {/* address input */}
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-              Service Address
-            </label>
-            <textarea
-              rows={3}
-              placeholder="123 Main St, Apt 4B, New York, NY..."
-              {...register("address", { required: "Address is required" })}
-              className="w-full p-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all font-medium text-gray-700 resize-none"
-            />
-            {errors.address && <p className="text-red-500 text-xs mt-1 font-bold">{errors.address.message}</p>}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-bold text-gray-700">Service Address</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                required
+                placeholder="Where do you need the service?"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white text-sm"
+              />
+            </div>
           </div>
 
-          {/* total price and buttons */}
+          {!user?.phoneNumber && (
+            <div className="bg-blue-50/50 border border-blue-100 p-4 rounded-2xl space-y-3">
+              <div className="flex items-start gap-2 text-blue-800">
+                <AlertCircle size={18} className="shrink-0 mt-0.5" />
+                <p className="text-xs font-medium leading-relaxed">
+                  We need your mobile number so the provider can coordinate with you. It will be saved securely to your profile.
+                </p>
+              </div>
+
+              <div className="relative">
+                <Phone className="absolute left-3 top-2.5 h-4 w-4 text-blue-400 pointer-events-none" />
+                <input
+                  type="tel"
+                  required
+                  placeholder="+91 98765 43210"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 rounded-xl border border-blue-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-white text-sm"
+                />
+              </div>
+              {phoneError && <p className="text-red-500 text-xs font-bold">{phoneError}</p>}
+            </div>
+          )}
+
           <div className="pt-4 border-t border-gray-100 mt-6">
-            <div className="flex justify-between items-center mb-6">
-               <span className="text-gray-500 font-medium">Total Price</span>
-               <span className="text-2xl font-bold text-gray-900">{formatINR(price)}</span>
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm font-bold text-gray-700">Total Price</span>
+              <span className="text-xl font-black text-gray-900">{formatINR(price)}</span>
             </div>
-            
+
             <button
               type="submit"
-              disabled={isPending}
-              className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition-all shadow-lg shadow-gray-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={createBookingMutation.isPending}
+              className="w-full bg-black text-white py-3.5 rounded-xl font-bold text-sm hover:bg-gray-800 transition-all shadow-lg flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {isPending ? "Processing..." : "Confirm & Pay"}
+              {createBookingMutation.isPending ? (
+                <><Loader2 className="animate-spin" size={18} /> Processing...</>
+              ) : (
+                "Confirm Booking"
+              )}
             </button>
           </div>
 

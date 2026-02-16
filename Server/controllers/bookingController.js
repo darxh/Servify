@@ -1,78 +1,14 @@
 const Booking = require("../models/bookingModel");
 const Service = require("../models/serviceModel");
-
-// const createBooking = async (req, res) => {
-//   try {
-//     const { serviceId, bookingDate, address } = req.body;
-
-//     const today = new Date().toISOString().split("T")[0];
-
-//     if (bookingDate < today) {
-//       return res.status(400).json({
-//         message: "You cannot book services for past dates."
-//       });
-//     }
-
-
-//     const service = await Service.findById(serviceId);
-
-//     if (!service) {
-//       return res.status(404).json({ message: "Service not found" });
-//     }
-
-//     // Prevent Provider from booking their own service
-//     if (service.provider.toString() === req.user._id.toString()) {
-//       return res
-//         .status(400)
-//         .json({ message: "You cannot book your own service" });
-//     }
-
-//     // avalibilty checking
-//     const newStartTime = new Date(bookingDate);
-//     const newEndTime = new Date(newStartTime.getTime() + service.duration * 60000);
-
-//     const existingBookings = await Booking.find({
-//       provider: service.provider,
-//       status: { $in: ["pending", "confirmed"] },
-//     }).populate("service");
-
-//     const hasConflict = existingBookings.some((booking) => {
-//       const existingStart = new Date(booking.bookingDate);
-//       const duration = booking.service ? booking.service.duration : 60;
-//       const existingEnd = new Date(existingStart.getTime() + duration * 60000);
-
-//       return newStartTime < existingEnd && newEndTime > existingStart;
-//     });
-
-//     if (hasConflict) {
-//       return res.status(400).json({
-//         message: "Provider is already booked for this time slot. Please choose another time."
-//       });
-//     }
-
-//     // Create Booking
-//     const booking = await Booking.create({
-//       user: req.user._id,
-//       provider: service.provider,
-//       service: service._id,
-//       amount: service.price,
-//       bookingDate,
-//       address,
-//     });
-
-//     res.status(201).json(booking);
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
+const User = require("../models/userModel");
 
 const createBooking = async (req, res) => {
   try {
-    const { serviceId, bookingDate, address } = req.body;
+    const { serviceId, bookingDate, address, phoneNumber } = req.body;
 
     const requestedDate = new Date(bookingDate);
     const now = new Date();
-    
+
     if (requestedDate < now) {
       return res.status(400).json({ message: "Cannot book dates in the past." });
     }
@@ -87,8 +23,8 @@ const createBooking = async (req, res) => {
     }
 
     const newStart = requestedDate.getTime();
-    const newEnd = newStart + (service.duration * 60000); 
- 
+    const newEnd = newStart + (service.duration * 60000);
+
     const existingBookings = await Booking.find({
       provider: service.provider,
       status: { $in: ["pending", "confirmed"] },
@@ -106,6 +42,14 @@ const createBooking = async (req, res) => {
       return res.status(400).json({
         message: "This time slot is already booked. Please choose another time."
       });
+    }
+
+    if (phoneNumber) {
+      const user = await User.findById(req.user._id);
+      if (user && !user.phoneNumber) {
+        user.phoneNumber = phoneNumber;
+        await user.save();
+      }
     }
 
     const booking = await Booking.create({
@@ -128,9 +72,9 @@ const getMyBookings = async (req, res) => {
     const bookings = await Booking.find({
       $or: [{ user: req.user._id }, { provider: req.user._id }],
     })
-      .populate("service", "name price image images duration category") 
-      .populate("user", "name email")
-      .populate("provider", "name email")
+      .populate("service", "name price image images duration category")
+      .populate("user", "name email phoneNumber")
+      .populate("provider", "name email phoneNumber")
       .sort("-createdAt");
 
     res.json(bookings);
