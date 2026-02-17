@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const loginWithGoogle = async (googleToken) => { 
+  const loginWithGoogle = async (googleToken) => {
     try {
       const { data } = await apiClient.post("/auth/google", { token: googleToken });
       localStorage.setItem("accessToken", data.accessToken);
@@ -58,13 +58,18 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedData) => {
+    setUser((prevUser) => ({ ...prevUser, ...updatedData }));
+  };
+
   const value = {
     user,
     loading,
     isAuthenticated,
     login,
-    loginWithGoogle, 
+    loginWithGoogle,
     logout,
+    updateUser,
   };
 
   return (
