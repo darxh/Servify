@@ -1,14 +1,23 @@
 const Service = require("../models/serviceModel");
 const Category = require("../models/categoryModel");
 const Booking = require("../models/bookingModel");
+const User = require("../models/userModel");
 
 // @desc    Create new service
 // @route   POST /api/v1/services
 // @access  Private (Provider)
 const createService = async (req, res) => {
-  try { 
-    const { name, description, price, duration, category, address, lat, lng } = req.body;
+  try {
+    const { name, description, price, duration, category, address, lat, lng, phoneNumber } = req.body;
 
+    if (phoneNumber) {
+      const user = await User.findById(req.user._id);
+      if (user && !user.phoneNumber) {
+        user.phoneNumber = phoneNumber;
+        await user.save();
+      }
+    }
+    
     let imagePaths = [];
     if (req.files && req.files.length > 0) {
       imagePaths = req.files.map((file) => file.path);
@@ -18,7 +27,7 @@ const createService = async (req, res) => {
     if (!categoryExists) {
       return res.status(400).json({ message: "Invalid category Id" });
     }
- 
+
     let locationObject = undefined;
     if (lat && lng) {
       locationObject = {
@@ -36,8 +45,8 @@ const createService = async (req, res) => {
       price,
       duration,
       images: imagePaths,
-      address, 
-      location: locationObject 
+      address,
+      location: locationObject
     });
 
     res.status(201).json(service);
@@ -73,9 +82,9 @@ const getAllServices = async (req, res) => {
       if (minPrice) filters.price.$gte = Number(minPrice);
       if (maxPrice) filters.price.$lte = Number(maxPrice);
     }
- 
+
     if (lat && lng) {
-      const radiusInMeters = radius ? Number(radius) * 1000 : 50000; 
+      const radiusInMeters = radius ? Number(radius) * 1000 : 50000;
       filters.location = {
         $near: {
           $geometry: {
@@ -86,10 +95,10 @@ const getAllServices = async (req, res) => {
         },
       };
     }
-    
-    let sortOption = {}; 
+
+    let sortOption = {};
     if (!lat || !lng) {
-      sortOption = { createdAt: -1 }; 
+      sortOption = { createdAt: -1 };
       if (sort === "price-asc") {
         sortOption = { price: 1 };
       } else if (sort === "price-desc") {
@@ -102,7 +111,7 @@ const getAllServices = async (req, res) => {
       .populate("category", "name slug")
       .populate("provider", "name email profileImage")
       .populate("reviews");
-     
+
     if (Object.keys(sortOption).length > 0) {
       query = query.sort(sortOption);
     }
@@ -141,7 +150,7 @@ const getServiceById = async (req, res) => {
 // @route   PUT /api/v1/services/:id
 // @access  Private (Provider)
 const updateService = async (req, res) => {
-  try { 
+  try {
     const { name, description, price, duration, category, address, lat, lng } = req.body;
     const service = await Service.findById(req.params.id);
 
