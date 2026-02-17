@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X, Star } from "lucide-react";
 import { useCreateReview } from "../../../hooks/useCreateReview";
+import toast from "react-hot-toast";
 
 const ReviewModal = ({ isOpen, onClose, serviceId }) => {
   const [rating, setRating] = useState(5); // Default 5 stars
@@ -17,13 +18,13 @@ const ReviewModal = ({ isOpen, onClose, serviceId }) => {
       { serviceId, rating, comment },
       {
         onSuccess: () => {
-          alert("Review submitted successfully!");
+          toast.success("Review submitted successfully!");
           onClose();
           setComment(""); 
           setRating(5);
         },
         onError: (error) => {
-          alert(error.response?.data?.message || "Failed to submit review");
+          toast.error(error.response?.data?.message || "Failed to submit review");
         }
       }
     );

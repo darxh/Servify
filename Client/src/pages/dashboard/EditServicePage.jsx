@@ -16,6 +16,7 @@ import {
   MapPin,
   Navigation
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const EditServicePage = () => {
   const { id } = useParams();
@@ -59,11 +60,10 @@ const EditServicePage = () => {
     }
   }, [service, reset]);
 
-  // Image Handling
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + (service?.images?.length || 0) > 10) {
-      alert("You can't add that many images.");
+    if (files.length + (service?.images?.length || 0) > 5) {
+      toast.error("You can't add more than 5 images.");
       return;
     }
     setSelectedFiles(files);
@@ -129,7 +129,7 @@ const EditServicePage = () => {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
           const data = await response.json();
           if (data && data.display_name) {
-            setValue("address", data.display_name);
+            setValue("address", data.display_name); 
             setVerifiedAddress(data.display_name);
             setLocationMessage({ type: "success", text: "Location updated to current position!" });
           }
@@ -146,6 +146,7 @@ const EditServicePage = () => {
     );
   };
 
+
   const onSubmit = (data) => {
     if (!coordinates.lat || !coordinates.lng || currentAddress !== verifiedAddress) {
       setLocationMessage({ type: "error", text: "Address changed! You must click Verify before saving." });
@@ -157,7 +158,8 @@ const EditServicePage = () => {
     formData.append("description", data.description);
     formData.append("price", data.price);
     formData.append("duration", data.duration);
-    formData.append("category", data.category); 
+    formData.append("category", data.category);
+    
     formData.append("address", data.address);
     formData.append("lat", coordinates.lat);
     formData.append("lng", coordinates.lng);
@@ -165,7 +167,13 @@ const EditServicePage = () => {
     selectedFiles.forEach((file) => formData.append("images", file));
 
     updateServiceMutation.mutate({ serviceId: id, formData }, {
-      onSuccess: () => navigate("/dashboard/services")
+      onSuccess: () => {
+        toast.success("Service updated successfully!");
+        navigate("/dashboard/services");
+      },
+      onError: () => {
+        toast.error("Failed to update service.");
+      }
     });
   };
 

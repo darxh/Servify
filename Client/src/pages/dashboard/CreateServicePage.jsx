@@ -17,6 +17,7 @@ import {
   Phone,
   AlertCircle
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const CreateServicePage = () => {
   const navigate = useNavigate();
@@ -44,8 +45,8 @@ const CreateServicePage = () => {
   // Image Handling
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
-    if (files.length + selectedFiles.length > 10) {
-      alert("You can't add more than 10 images.");
+    if (files.length + selectedFiles.length > 5) {
+      toast.error("You can't add more than 5 images.");
       return;
     }
     const newFiles = [...selectedFiles, ...files];
@@ -134,7 +135,7 @@ const CreateServicePage = () => {
     }
 
     if (selectedFiles.length === 0) {
-      alert("Please upload at least one image.");
+      toast.error("Please upload at least one image.");
       return;
     }
 
@@ -165,10 +166,11 @@ const CreateServicePage = () => {
         if (needsPhoneInput && phoneNumber) {
           updateUser({ ...user, phoneNumber });
         }
+        toast.success("Service published successfully!");
         navigate("/dashboard/services");
       },
-      onError: () => {
-        alert("Failed to create service. Please try again.");
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to create service.");
       }
     });
   };

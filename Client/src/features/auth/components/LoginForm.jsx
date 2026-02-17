@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,11 +26,13 @@ const LoginForm = () => {
   const onSubmit = async (data) => {
     try {
       await login(data);
+      toast.success("Welcome back to Servify!");
       navigate("/");
     } catch (error) {
-      setError("root", { 
-        message: error.response?.data?.message || "Login failed. Please try again." 
-      });
+      // setError("root", { 
+      //   message: error.response?.data?.message || "Login failed. Please try again." 
+      // });
+      toast.error(error.response?.data?.message || "Login failed. Please try again.");
     }
   };
 

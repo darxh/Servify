@@ -1,15 +1,16 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthContext";
-import { useUpdateProfile } from "../../hooks/useUpdateProfile"; 
-import { User, Mail, Lock, Camera, Save, Loader2, Phone } from "lucide-react"; 
+import { useUpdateProfile } from "../../hooks/useUpdateProfile";
+import { User, Mail, Lock, Camera, Save, Loader2, Phone } from "lucide-react";
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 const SettingsPage = () => {
   const { user } = useAuth();
   const updateProfileMutation = useUpdateProfile();
-  
+
   const { register, handleSubmit, reset, formState: { isDirty, errors } } = useForm();
-  
+
   const [preview, setPreview] = useState(user?.profileImage || null);
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -19,7 +20,7 @@ const SettingsPage = () => {
         name: user.name,
         email: user.email,
         bio: user.bio || "",
-        phoneNumber: user.phoneNumber || "", 
+        phoneNumber: user.phoneNumber || "",
       });
       setPreview(user.profileImage);
     }
@@ -37,8 +38,8 @@ const SettingsPage = () => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("bio", data.bio);
-    formData.append("phoneNumber", data.phoneNumber); 
-    
+    formData.append("phoneNumber", data.phoneNumber);
+
     if (data.password) {
       formData.append("password", data.password);
     }
@@ -46,31 +47,30 @@ const SettingsPage = () => {
     if (selectedFile) {
       formData.append("profileImage", selectedFile);
     }
-
     updateProfileMutation.mutate(formData, {
       onSuccess: () => {
-        alert("Profile updated successfully!!");
+        toast.success("Profile updated successfully!");
         setSelectedFile(null);
       },
       onError: (error) => {
-        alert("Failed to update profile: " + (error.response?.data?.message || "Unknown error"));
+        toast.error(error.response?.data?.message || "Failed to update profile");
       }
     });
   };
 
   return (
     <div className="max-w-4xl mx-auto pb-20">
-      
+
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
         <p className="text-gray-500 mt-2">Manage your profile and security preferences.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         <div className="lg:col-span-1">
           <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center sticky top-24">
-            
+
             <div className="relative inline-block mb-4 group">
               <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-100 mx-auto">
                 {preview ? (
@@ -81,17 +81,17 @@ const SettingsPage = () => {
                   </div>
                 )}
               </div>
-              
-              <label 
+
+              <label
                 htmlFor="avatar-upload"
                 className="absolute bottom-1 right-1 bg-blue-600 text-white p-2.5 rounded-full cursor-pointer hover:bg-blue-700 transition shadow-md"
               >
                 <Camera size={16} />
               </label>
-              <input 
-                type="file" 
-                id="avatar-upload" 
-                className="hidden" 
+              <input
+                type="file"
+                id="avatar-upload"
+                className="hidden"
                 accept="image/*"
                 onChange={handleImageChange}
               />
@@ -99,7 +99,7 @@ const SettingsPage = () => {
 
             <h2 className="text-xl font-bold text-gray-900">{user?.name}</h2>
             <p className="text-sm text-gray-500 mb-4 capitalize">{user?.role}</p>
-            
+
             <div className="text-xs text-gray-400 bg-gray-50 py-2 px-4 rounded-full inline-block">
               Member since {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}
             </div>
@@ -108,7 +108,7 @@ const SettingsPage = () => {
 
         <div className="lg:col-span-2">
           <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-            
+
             <div className="p-8 space-y-6">
               <h3 className="text-lg font-bold text-gray-900 border-b border-gray-100 pb-4">
                 Profile Details

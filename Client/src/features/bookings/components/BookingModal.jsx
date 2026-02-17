@@ -4,6 +4,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useCreateBooking } from "../../../hooks/useCreateBooking";
 import { formatINR } from "../../../utils/formatCurrency";
 import { X, Calendar, Clock, MapPin, Phone, Loader2, AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const BookingModal = ({ isOpen, onClose, serviceId, price }) => {
   const { user, updateUser } = useAuth();
@@ -43,10 +44,12 @@ const BookingModal = ({ isOpen, onClose, serviceId, price }) => {
           updateUser({ ...user, phoneNumber });
         }
 
+        toast.success("Booking confirmed successfully!");
         onClose();
         navigate("/dashboard/bookings");
       },
       onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to create booking.");
         setPhoneError(error.response?.data?.message || "Failed to create booking.");
       }
     });

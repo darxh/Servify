@@ -5,6 +5,7 @@ import { useDeleteService } from "../../hooks/useDeleteService";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import { formatINR } from "../../utils/formatCurrency";
+import toast from "react-hot-toast";
 
 const MyServicesPage = () => {
   const { user } = useAuth();
@@ -12,13 +13,21 @@ const MyServicesPage = () => {
   const { mutate: deleteService } = useDeleteService();
 
   const myServices = services.filter((service) => {
-      const providerId = service.provider?._id || service.provider;
-      return providerId === user?._id;
+    const providerId = service.provider?._id || service.provider;
+    return providerId === user?._id;
   });
-
+ 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this service? This cannot be undone.")) {
-      deleteService(id);
+
+      deleteService(id, {
+        onSuccess: () => {
+          toast.success("Service deleted successfully!");
+        },
+        onError: () => {
+          toast.error("Failed to delete service.");
+        }
+      });
     }
   };
 
@@ -31,13 +40,13 @@ const MyServicesPage = () => {
 
   if (isLoading) return (
     <div className="flex h-96 items-center justify-center">
-       <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
     </div>
   );
 
   return (
     <div className="space-y-8 pb-12">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -48,9 +57,9 @@ const MyServicesPage = () => {
 
       {/* Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        
+
         {/*  "Add New Service" Button */}
-        <Link 
+        <Link
           to="/dashboard/services/new"
           className="group flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-blue-500 hover:bg-blue-50/50 transition-all min-h-[300px] cursor-pointer"
         >
@@ -63,26 +72,26 @@ const MyServicesPage = () => {
 
         {/* Service Cards */}
         {myServices.map((service) => (
-          <div 
-            key={service._id} 
+          <div
+            key={service._id}
             className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col h-full group"
           >
-            
+
             {/* Image Area */}
             <div className="relative h-48 bg-gray-100 overflow-hidden">
-              <img 
-                src={getServiceImage(service)} 
-                alt={service.name} 
+              <img
+                src={getServiceImage(service)}
+                alt={service.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               {/* Category Badge */}
               <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-gray-900 shadow-sm">
-                 {service.category?.name || "Service"}
+                {service.category?.name || "Service"}
               </div>
-              
+
               {/* Price Tag */}
               <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
-              {formatINR(service.price)}
+                {formatINR(service.price)}
               </div>
             </div>
 
@@ -91,14 +100,14 @@ const MyServicesPage = () => {
               <h3 className="font-bold text-gray-900 line-clamp-1 text-lg mb-1" title={service.name}>
                 {service.name}
               </h3>
-              
+
               {/* Stats Row */}
               <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mt-1 mb-4">
-                 <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100">
-                    Active
-                 </span>
-                 <span>•</span>
-                 <span>{service.duration} mins</span>
+                <span className="bg-green-50 text-green-700 px-2 py-0.5 rounded border border-green-100">
+                  Active
+                </span>
+                <span>•</span>
+                <span>{service.duration} mins</span>
               </div>
 
               {/* Action Buttons */}
@@ -109,7 +118,7 @@ const MyServicesPage = () => {
                 >
                   <Pencil size={14} /> Edit
                 </Link>
-                
+
                 <button
                   onClick={() => handleDelete(service._id)}
                   className="flex items-center justify-center gap-2 px-3 py-2 bg-white text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition border border-gray-200"

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatINR } from "../../utils/formatCurrency";
+import toast from "react-hot-toast";
 
 const MyBookingsPage = () => {
   const { user } = useAuth();
@@ -24,13 +25,23 @@ const MyBookingsPage = () => {
   const providerBookings = bookings.filter(b => b.provider?._id === user?._id);
 
   const handleCancel = (id) => {
-    if (window.confirm("Are you sure you want to cancel this?")) {
-      cancelBookingMutation.mutate(id);
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
+      cancelBookingMutation.mutate(id, {
+        onSuccess: () => toast.success("Booking cancelled successfully!"),
+        onError: () => toast.error("Failed to cancel booking.")
+      });
     }
   };
 
   const handleStatusUpdate = (id, newStatus) => {
-    updateBookingMutation.mutate({ id, status: newStatus });
+    updateBookingMutation.mutate({ id, status: newStatus }, {
+      onSuccess: () => {
+        if (newStatus === "confirmed") toast.success("Job accepted successfully!");
+        if (newStatus === "completed") toast.success("Job marked as completed!");
+        if (newStatus === "cancelled") toast.success("Job rejected.");
+      },
+      onError: () => toast.error("Failed to update status.")
+    });
   };
 
   const getServiceImage = (service) => {
