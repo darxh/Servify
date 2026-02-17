@@ -6,7 +6,7 @@ import { useUpdateBooking } from "../../hooks/useUpdateBooking";
 import ReviewModal from "../../features/reviews/components/ReviewModal";
 import {
   Calendar, MapPin, Clock, User, CheckCircle, XCircle,
-  MessageSquare, Briefcase, ShoppingBag
+  MessageSquare, Briefcase, ShoppingBag, Phone
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatINR } from "../../utils/formatCurrency";
@@ -75,8 +75,8 @@ const MyBookingsPage = () => {
           <button
             onClick={() => setActiveTab("customer")}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "customer"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
               }`}
           >
             <ShoppingBag size={18} />
@@ -85,8 +85,8 @@ const MyBookingsPage = () => {
           <button
             onClick={() => setActiveTab("provider")}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === "provider"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
+              ? "bg-white text-blue-600 shadow-sm"
+              : "text-gray-500 hover:text-gray-700"
               }`}
           >
             <Briefcase size={18} />
@@ -109,167 +109,181 @@ const MyBookingsPage = () => {
           </div>
         ) : (
           (activeTab === "customer" ? customerBookings : providerBookings).map((booking) => {
-            
+
             const displayPrice = booking.price || booking.service?.price;
             const displayAddress = booking.service?.address || booking.address;
 
+            const targetPhone = activeTab === 'customer' ? booking.provider?.phoneNumber : booking.user?.phoneNumber;
+
             return (
-            <div
-              key={booking._id}
-              className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all group"
-            >
-              <div className="flex flex-col md:flex-row gap-6">
+              <div
+                key={booking._id}
+                className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-all group"
+              >
+                <div className="flex flex-col md:flex-row gap-6">
 
-                {/* Image Thumbnail */}
-                <div className="w-full md:w-40 h-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative">
-                  <img
-                    src={getServiceImage(booking.service)}
-                    alt={booking.service?.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-2 right-2 md:hidden">
-                    {getStatusBadge(booking.status)}
+                  {/* Image Thumbnail */}
+                  <div className="w-full md:w-40 h-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden shrink-0 relative">
+                    <img
+                      src={getServiceImage(booking.service)}
+                      alt={booking.service?.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2 right-2 md:hidden">
+                      {getStatusBadge(booking.status)}
+                    </div>
                   </div>
-                </div>
 
-                {/* Info Section */}
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
-                          {booking.service?.name || "Unknown Service"}
-                        </h3>
-                        <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                          {activeTab === 'customer' ? (
-                            <>Provided by <span className="font-semibold text-gray-900">{booking.provider?.name}</span></>
+                  {/* Info Section */}
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+                            {booking.service?.name || "Unknown Service"}
+                          </h3>
+                          <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                            {activeTab === 'customer' ? (
+                              <>Provided by <span className="font-semibold text-gray-900">{booking.provider?.name}</span></>
+                            ) : (
+                              <>Customer: <span className="font-semibold text-blue-600 flex items-center gap-1"><User size={14} /> {booking.user?.name}</span></>
+                            )}
+                          </p>
+                        </div>
+                        <div className="hidden md:block">
+                          {getStatusBadge(booking.status)}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 mt-4 text-sm text-gray-600">
+
+                        <div className="flex items-center gap-2">
+                          <Calendar size={16} className="text-gray-400 shrink-0" />
+                          <span className="font-medium">
+                            {new Date(booking.bookingDate).toLocaleDateString(undefined, {
+                              month: 'short', day: 'numeric', year: 'numeric'
+                            })}
+                            <span className="text-gray-400 mx-1">at</span>
+                            {new Date(booking.bookingDate).toLocaleTimeString([], {
+                              hour: '2-digit', minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Clock size={16} className="text-gray-400 shrink-0" />
+                          <span>{booking.service?.duration || 60} mins</span>
+                        </div>
+
+                        <div className="flex items-center gap-2 sm:col-span-2">
+                          <MapPin size={16} className="text-gray-400 shrink-0" />
+                          {displayAddress ? (
+                            <a
+                              href={`https://maps.google.com/?q=...{encodeURIComponent(displayAddress)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="truncate max-w-[300px] text-gray-700 hover:text-blue-600 hover:underline transition-colors"
+                              title={displayAddress}
+                            >
+                              {displayAddress}
+                            </a>
                           ) : (
-                            <>Customer: <span className="font-semibold text-blue-600 flex items-center gap-1"><User size={14} /> {booking.user?.name}</span></>
+                            <span className="italic text-gray-400">Location not provided</span>
                           )}
-                        </p>
-                      </div>
-                      <div className="hidden md:block">
-                        {getStatusBadge(booking.status)}
+                        </div>
+
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 mt-4 text-sm text-gray-600">
-                      
-                      <div className="flex items-center gap-2">
-                        <Calendar size={16} className="text-gray-400 shrink-0" />
-                        <span className="font-medium">
-                          {new Date(booking.bookingDate).toLocaleDateString(undefined, {
-                            month: 'short', day: 'numeric', year: 'numeric'
-                          })}
-                          <span className="text-gray-400 mx-1">at</span>
-                          {new Date(booking.bookingDate).toLocaleTimeString([], {
-                            hour: '2-digit', minute: '2-digit'
-                          })}
-                        </span>
-                      </div>
+                    {/* Action Bar */}
+                    <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
 
-                      <div className="flex items-center gap-2">
-                        <Clock size={16} className="text-gray-400 shrink-0" />
-                        <span>{booking.service?.duration || 60} mins</span>
-                      </div>
+                      <span className="font-bold text-xl text-gray-900">{formatINR(displayPrice)}</span>
 
-                      <div className="flex items-center gap-2 sm:col-span-2">
-                        <MapPin size={16} className="text-gray-400 shrink-0" />
-                        {displayAddress ? (
-                          <a 
-                            href={`https://maps.google.com/?q=${encodeURIComponent(displayAddress)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="truncate max-w-[300px] text-gray-700 hover:text-blue-600 hover:underline transition-colors"
-                            title={displayAddress}
+                      <div className="flex gap-2">
+
+                        {targetPhone && ["pending", "confirmed"].includes(booking.status) && (
+                          <a
+                            href={`tel:${targetPhone}`}
+                            className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-bold rounded-lg hover:bg-blue-100 transition flex items-center gap-2 border border-blue-200"
                           >
-                            {displayAddress}
+                            <Phone size={16} />
+                            {activeTab === 'customer' ? 'Call Provider' : 'Call Customer'}
                           </a>
-                        ) : (
-                          <span className="italic text-gray-400">Location not provided</span>
                         )}
+
+                        {activeTab === 'customer' && (
+                          <>
+                            {["pending", "confirmed"].includes(booking.status) && (
+                              <button
+                                onClick={() => handleCancel(booking._id)}
+                                disabled={cancelBookingMutation.isPending}
+                                className="px-4 py-2 border border-gray-300 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition"
+                              >
+                                Cancel
+                              </button>
+                            )}
+
+                            {booking.status === "completed" && !booking.isReviewed && (
+                              <button
+                                onClick={() => setReviewModal({ isOpen: true, serviceId: booking.service?._id })}
+                                className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-black transition flex items-center gap-2"
+                              >
+                                <MessageSquare size={16} /> Leave Review
+                              </button>
+                            )}
+
+                            {booking.isReviewed && (
+                              <span className="text-sm text-green-600 font-bold flex items-center gap-1 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
+                                <CheckCircle size={14} /> Reviewed
+                              </span>
+                            )}
+                          </>
+                        )}
+
+                        {activeTab === 'provider' && (
+                          <>
+                            {booking.status === "pending" && (
+                              <>
+                                <button
+                                  onClick={() => handleStatusUpdate(booking._id, "cancelled")}
+                                  className="px-4 py-2 border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 flex items-center gap-2"
+                                >
+                                  <XCircle size={16} /> Reject
+                                </button>
+                                <button
+                                  onClick={() => handleStatusUpdate(booking._id, "confirmed")}
+                                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                                >
+                                  <CheckCircle size={16} /> Accept Job
+                                </button>
+                              </>
+                            )}
+                            {booking.status === "confirmed" && (
+                              <button
+                                onClick={() => handleStatusUpdate(booking._id, "completed")}
+                                className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 flex items-center gap-2"
+                              >
+                                <CheckCircle size={16} /> Mark Completed
+                              </button>
+                            )}
+                          </>
+                        )}
+
+                        <Link
+                          to={`/services/${booking.service?._id}`}
+                          className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition"
+                        >
+                          View Details
+                        </Link>
                       </div>
-
                     </div>
                   </div>
 
-                  <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-                    
-                    <span className="font-bold text-xl text-gray-900">{formatINR(displayPrice)}</span>
-
-                    <div className="flex gap-2">
-
-                      {activeTab === 'customer' && (
-                        <>
-                          {["pending", "confirmed"].includes(booking.status) && (
-                            <button
-                              onClick={() => handleCancel(booking._id)}
-                              disabled={cancelBookingMutation.isPending}
-                              className="px-4 py-2 border border-gray-300 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 transition"
-                            >
-                              Cancel Booking
-                            </button>
-                          )}
-
-                          {booking.status === "completed" && !booking.isReviewed && (
-                            <button
-                              onClick={() => setReviewModal({ isOpen: true, serviceId: booking.service?._id })}
-                              className="px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-black transition flex items-center gap-2"
-                            >
-                              <MessageSquare size={16} /> Leave Review
-                            </button>
-                          )}
-
-                          {booking.isReviewed && (
-                            <span className="text-sm text-green-600 font-bold flex items-center gap-1 bg-green-50 px-3 py-2 rounded-lg border border-green-100">
-                              <CheckCircle size={14} /> Reviewed
-                            </span>
-                          )}
-                        </>
-                      )}
-
-                      {activeTab === 'provider' && (
-                        <>
-                          {booking.status === "pending" && (
-                            <>
-                              <button
-                                onClick={() => handleStatusUpdate(booking._id, "cancelled")}
-                                className="px-4 py-2 border border-red-200 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-50 flex items-center gap-2"
-                              >
-                                <XCircle size={16} /> Reject
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(booking._id, "confirmed")}
-                                className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                              >
-                                <CheckCircle size={16} /> Accept Job
-                              </button>
-                            </>
-                          )}
-                          {booking.status === "confirmed" && (
-                            <button
-                              onClick={() => handleStatusUpdate(booking._id, "completed")}
-                              className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 flex items-center gap-2"
-                            >
-                              <CheckCircle size={16} /> Mark Completed
-                            </button>
-                          )}
-                        </>
-                      )}
-
-                      <Link
-                        to={`/services/${booking.service?._id}`}
-                        className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
                 </div>
-
               </div>
-            </div>
-          )})
+            )
+          })
         )}
       </div>
 
