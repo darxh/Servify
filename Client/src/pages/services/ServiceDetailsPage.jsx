@@ -323,6 +323,13 @@ const ServiceDetailsPage = () => {
                 >
                   Edit Service
                 </Link>
+              ) : !user ? (
+                <button
+                  onClick={() => navigate("/auth/login")}
+                  className="w-full bg-black text-white py-3.5 rounded-lg font-bold text-lg hover:bg-gray-800 transition shadow-lg transform active:scale-[0.98]"
+                >
+                  Log in to Book
+                </button>
               ) : (
                 <button
                   onClick={() => setIsBookingModalOpen(true)}
