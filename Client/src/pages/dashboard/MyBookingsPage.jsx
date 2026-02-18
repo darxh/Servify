@@ -6,7 +6,7 @@ import { useUpdateBooking } from "../../hooks/useUpdateBooking";
 import ReviewModal from "../../features/reviews/components/ReviewModal";
 import {
   Calendar, MapPin, Clock, User, CheckCircle, XCircle,
-  MessageSquare, Briefcase, ShoppingBag, Phone
+  MessageSquare, Briefcase, ShoppingBag, Phone, AlertCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { formatINR } from "../../utils/formatCurrency";
@@ -25,12 +25,46 @@ const MyBookingsPage = () => {
   const providerBookings = bookings.filter(b => b.provider?._id === user?._id);
 
   const handleCancel = (id) => {
-    if (window.confirm("Are you sure you want to cancel this booking?")) {
-      cancelBookingMutation.mutate(id, {
-        onSuccess: () => toast.success("Booking cancelled successfully!"),
-        onError: () => toast.error("Failed to cancel booking.")
-      });
-    }
+    toast.custom((t) => (
+      <div
+        className={`${
+          t.visible ? 'animate-enter' : 'animate-leave'
+        } max-w-sm w-full bg-white shadow-2xl rounded-3xl pointer-events-auto flex flex-col p-6 gap-5 border border-gray-100`}
+      >
+        <div className="flex items-start gap-4">
+          <div className="bg-red-50 p-3 rounded-full shrink-0 border border-red-100">
+            <AlertCircle className="h-6 w-6 text-red-600" />
+          </div>
+          <div className="pt-1">
+            <h3 className="font-bold text-gray-900 text-lg">Cancel Booking?</h3>
+            <p className="text-sm text-gray-500 mt-1">The provider will be notified. Are you sure you want to proceed?</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-bold rounded-xl transition-colors"
+          >
+            Keep it
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              cancelBookingMutation.mutate(id, {
+                onSuccess: () => toast.success("Booking cancelled successfully!"),
+                onError: () => toast.error("Failed to cancel booking.")
+              });
+            }}
+            className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition-colors shadow-lg shadow-red-200"
+          >
+            Yes, Cancel
+          </button>
+        </div>
+      </div>
+    ), { 
+      duration: Infinity, 
+      id: `cancel-${id}` 
+    });
   };
 
   const handleStatusUpdate = (id, newStatus) => {

@@ -16,19 +16,48 @@ const MyServicesPage = () => {
     const providerId = service.provider?._id || service.provider;
     return providerId === user?._id;
   });
- 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this service? This cannot be undone.")) {
 
-      deleteService(id, {
-        onSuccess: () => {
-          toast.success("Service deleted successfully!");
-        },
-        onError: () => {
-          toast.error("Failed to delete service.");
-        }
-      });
-    }
+  const handleDelete = (id) => {
+    toast.custom((t) => (
+      <div
+        className={`${
+          t.visible ? 'animate-enter' : 'animate-leave'
+        } max-w-sm w-full bg-white shadow-2xl rounded-3xl pointer-events-auto flex flex-col p-6 gap-5 border border-gray-100`}
+      >
+        <div className="flex items-start gap-4">
+          <div className="bg-red-50 p-3 rounded-full shrink-0 border border-red-100">
+            <Trash2 className="h-6 w-6 text-red-600" />
+          </div>
+          <div className="pt-1">
+            <h3 className="font-bold text-gray-900 text-lg">Delete Service?</h3>
+            <p className="text-sm text-gray-500 mt-1">This action cannot be undone. Are you sure you want to proceed?</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-bold rounded-xl transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              toast.dismiss(t.id);
+              deleteService(id, {
+                onSuccess: () => toast.success("Service deleted successfully!"),
+                onError: () => toast.error("Failed to delete service.")
+              });
+            }}
+            className="w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition-colors shadow-lg shadow-red-200"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>
+    ), { 
+      id: `delete-${id}`, 
+      duration: Infinity 
+    });
   };
 
   const getServiceImage = (service) => {

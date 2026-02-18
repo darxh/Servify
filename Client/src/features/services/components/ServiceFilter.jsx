@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Search, RotateCcw, Filter, MapPin, Loader2, X } from "lucide-react";
 import { useCategories } from "../../../hooks/useCategories";
+import toast from "react-hot-toast";
 
 const ServiceFilter = ({ filters, setFilters, onClose }) => {
   const { data: categories } = useCategories();
@@ -27,7 +28,7 @@ const ServiceFilter = ({ filters, setFilters, onClose }) => {
 
   const detectLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      toast.error("Geolocation is not supported by your browser");
       return;
     }
 
@@ -46,7 +47,7 @@ const ServiceFilter = ({ filters, setFilters, onClose }) => {
       },
       (error) => {
         console.error(error);
-        alert("Could not get your location. Please allow location permissions in your browser.");
+        toast.error("Could not get your location. Please allow location permissions.");
         setLocationLoading(false);
       }
     );
