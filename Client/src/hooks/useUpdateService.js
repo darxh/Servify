@@ -12,11 +12,12 @@ export const useUpdateService = () => {
     onSuccess: (updatedService) => {
       queryClient.invalidateQueries(["services"]);
       queryClient.invalidateQueries(["service", updatedService._id]);
-      alert("Service updated successfully!");
+      // alert("Service updated successfully!");
     },
     onError: (error) => {
+      // console.error("Update failed:", error);
+      // alert(error.response?.data?.message || "Failed to update service");
       console.error("Update failed:", error);
-      alert(error.response?.data?.message || "Failed to update service");
     }
   });
 };

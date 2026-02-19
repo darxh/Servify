@@ -11,11 +11,12 @@ export const useDeleteService = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["services"]);
-      alert("Service deleted successfully");
+      // alert("Service deleted successfully");
     },
     onError: (error) => {
+      // console.error("Delete failed:", error);
+      // alert(error.response?.data?.message || "Failed to delete service");
       console.error("Delete failed:", error);
-      alert(error.response?.data?.message || "Failed to delete service");
     },
   });
 };

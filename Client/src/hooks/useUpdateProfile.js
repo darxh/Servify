@@ -3,16 +3,18 @@ import apiClient from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 
 export const useUpdateProfile = () => {
-  const { updateUser } = useAuth(); // We use the function we just created
+  const { updateUser } = useAuth();
 
   return useMutation({
     mutationFn: async (data) => {
-      // Calling PUT /api/v1/auth/profile
       const response = await apiClient.put("/auth/profile", data);
       return response.data;
     },
     onSuccess: (data) => {
       updateUser(data);
     },
+    onError: (error) => {
+      console.error("Profile update failed:", error);
+    }
   });
 };

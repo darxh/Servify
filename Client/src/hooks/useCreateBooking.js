@@ -12,13 +12,14 @@ export const useCreateBooking = () => {
       return response.data;
     },
     onSuccess: () => {
-      alert("Booking confirmed successfully!");
+      // alert("Booking confirmed successfully!");
       queryClient.invalidateQueries(["bookings"]);
       navigate("/dashboard/bookings");
     },
     onError: (error) => {
-      const message = error.response?.data?.message || "Failed to book service";
-      alert(message);
+      // const message = error.response?.data?.message || "Failed to book service";
+      // alert(message);
+      console.error("Booking failed:", error);
     },
   });
 };
