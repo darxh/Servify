@@ -17,5 +17,8 @@ export const useCreateReview = () => {
       queryClient.invalidateQueries(["reviews"]);
       queryClient.invalidateQueries(["service"]);
     },
+    onError: (error) => {
+      console.error("Review Error:", error);
+    }
   });
 };

@@ -14,7 +14,6 @@ export const useCreateBooking = () => {
     onSuccess: () => {
       // alert("Booking confirmed successfully!");
       queryClient.invalidateQueries(["bookings"]);
-      navigate("/dashboard/bookings");
     },
     onError: (error) => {
       // const message = error.response?.data?.message || "Failed to book service";

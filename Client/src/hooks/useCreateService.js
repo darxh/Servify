@@ -13,7 +13,6 @@ export const useCreateService = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["services"]);
-      navigate("/dashboard/services");
     },
     onError: (error) => {
       // console.error("Failed to create service:", error);
