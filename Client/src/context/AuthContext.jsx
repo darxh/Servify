@@ -13,6 +13,26 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
 
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     const token = localStorage.getItem("accessToken");
+  //     if (!token) {
+  //       setLoading(false);
+  //       return;
+  //     }
+  //     try {
+  //       const { data } = await apiClient.get("/auth/me");
+  //       setUser(data);
+  //     } catch (error) {
+  //       localStorage.removeItem("accessToken");
+  //       setUser(null);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   checkAuth();
+  // }, []);
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("accessToken");
@@ -21,7 +41,9 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const { data } = await apiClient.get("/auth/me");
+        const { data } = await apiClient.get("/auth/me", {
+          _skipAuthRedirect: true
+        });
         setUser(data);
       } catch (error) {
         localStorage.removeItem("accessToken");
