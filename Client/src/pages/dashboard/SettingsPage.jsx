@@ -9,10 +9,12 @@ const SettingsPage = () => {
   const { user } = useAuth();
   const updateProfileMutation = useUpdateProfile();
 
-  const { register, handleSubmit, reset, formState: { isDirty, errors } } = useForm();
+  const { register, handleSubmit, reset, watch, formState: { isDirty, errors } } = useForm();
 
   const [preview, setPreview] = useState(user?.profileImage || null);
   const [selectedFile, setSelectedFile] = useState(null);
+
+  const newPasswordValue = watch("password");
 
   useEffect(() => {
     if (user) {
@@ -42,6 +44,7 @@ const SettingsPage = () => {
 
     if (data.password) {
       formData.append("password", data.password);
+      formData.append("currentPassword", data.currentPassword);
     }
 
     if (selectedFile) {
@@ -51,6 +54,7 @@ const SettingsPage = () => {
       onSuccess: () => {
         toast.success("Profile updated successfully!");
         setSelectedFile(null);
+        reset({ ...data, currentPassword: "", password: "" }); 
       },
       onError: (error) => {
         toast.error(error.response?.data?.message || "Failed to update profile");
@@ -174,16 +178,35 @@ const SettingsPage = () => {
               </h3>
 
               <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Current Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
+                  <input
+                    {...register("currentPassword", { 
+                      required: newPasswordValue ? "Current password is required to set a new one" : false 
+                    })}
+                    type="password"
+                    placeholder="Enter current password if changing it"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white"
+                  />
+                </div>
+                {errors.currentPassword && <p className="text-red-500 text-xs mt-1">{errors.currentPassword.message}</p>}
+              </div>
+
+              <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">New Password</label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                   <input
-                    {...register("password", { minLength: { value: 6, message: "Min 6 chars" } })}
+                    {...register("password", { 
+                      minLength: { value: 6, message: "Min 6 chars" } 
+                    })}
                     type="password"
                     placeholder="Leave blank to keep current password"
                     className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all bg-gray-50 focus:bg-white"
                   />
                 </div>
+                 {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
               </div>
             </div>
 

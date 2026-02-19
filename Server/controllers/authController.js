@@ -201,7 +201,7 @@ const getMe = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+password");
 
     if (user) {
       user.name = req.body.name || user.name;
@@ -213,6 +213,19 @@ const updateUserProfile = async (req, res) => {
       }
 
       if (req.body.password) {
+        if (!req.body.currentPassword) {
+          return res.status(400).json({ 
+            message: "You must provide your current password to set a new one." 
+          });
+        }
+
+        const isMatch = await user.comparePassword(req.body.currentPassword);
+        if (!isMatch) {
+          return res.status(400).json({ 
+            message: "The current password you entered is incorrect." 
+          });
+        }
+
         user.password = req.body.password;
       }
 
