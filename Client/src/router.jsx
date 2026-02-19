@@ -12,6 +12,7 @@ import MyBookingsPage from "./pages/dashboard/MyBookingsPage";
 import SettingsPage from "./pages/dashboard/SettingsPage";
 import ServicesPage from "./pages/services/ServicesPage";
 import EditServicePage from "./pages/dashboard/EditServicePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const NotFound = () => {
   return (
@@ -52,7 +53,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <MainLayout />,
+    // element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
