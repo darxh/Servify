@@ -2,7 +2,7 @@ const crypto = require("crypto")
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
 const sendEmail = require("../utils/sendEmail");
-const { verifyEmailTemplate } = require("../utils/emailTemplates");
+const { verifyEmailTemplate, resetPasswordTemplate } = require("../utils/emailTemplates");
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -207,22 +207,22 @@ const updateUserProfile = async (req, res) => {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
       user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
-      
+
       if (req.body.phoneNumber !== undefined) {
         user.phoneNumber = req.body.phoneNumber;
       }
 
       if (req.body.password) {
         if (!req.body.currentPassword) {
-          return res.status(400).json({ 
-            message: "You must provide your current password to set a new one." 
+          return res.status(400).json({
+            message: "You must provide your current password to set a new one."
           });
         }
 
         const isMatch = await user.comparePassword(req.body.currentPassword);
         if (!isMatch) {
-          return res.status(400).json({ 
-            message: "The current password you entered is incorrect." 
+          return res.status(400).json({
+            message: "The current password you entered is incorrect."
           });
         }
 
@@ -252,4 +252,80 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, verifyEmail, loginUser, googleLogin, getMe, updateUserProfile };
+// @desc    Forgot Password
+// @route   POST /api/v1/auth/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "There is no user with that email address." });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+    await user.save({ validateBeforeSave: false });
+
+    const resetUrl = `${process.env.CLIENT_URL}/auth/reset-password/${resetToken}`;
+    const message = resetPasswordTemplate(resetUrl, user.name);
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Servify Password Reset Request",
+        message,
+      });
+
+      res.status(200).json({ message: "Token sent to email!" });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      return res.status(500).json({ message: "There was an error sending the email. Try again later!" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/v1/auth/reset-password/:token
+// @access  Public
+const resetPassword = async (req, res) => {
+  try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Token is invalid or has expired" });
+    }
+
+    user.password = req.body.password;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful! You can now log in." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, verifyEmail, loginUser, googleLogin, getMe, updateUserProfile, forgotPassword, resetPassword };

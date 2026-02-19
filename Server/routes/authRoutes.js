@@ -8,7 +8,9 @@ const {
   getMe,
   updateUserProfile,
   verifyEmail,
-  googleLogin
+  googleLogin,
+  forgotPassword,
+  resetPassword
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -20,5 +22,8 @@ router.get("/verify/:token", verifyEmail);
 router.get("/me", protect, getMe);
 
 router.put("/profile", protect, upload.single("profileImage"), updateUserProfile);
+
+router.post("/forgot-password", forgotPassword);
+router.put("/reset-password/:token", resetPassword);
 
 module.exports = router;

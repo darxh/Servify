@@ -13,6 +13,8 @@ import SettingsPage from "./pages/dashboard/SettingsPage";
 import ServicesPage from "./pages/services/ServicesPage";
 import EditServicePage from "./pages/dashboard/EditServicePage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 
 const NotFound = () => {
   return (
@@ -48,6 +50,14 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <RegisterPage />,
+      },
+      {
+        path: "forgot-password",
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: "reset-password/:token",
+        element: <ResetPasswordPage />,
       },
     ],
   },

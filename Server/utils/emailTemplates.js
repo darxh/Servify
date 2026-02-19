@@ -51,4 +51,20 @@ const verifyEmailTemplate = (url, name) => {
     `;
   };
   
-  module.exports = { verifyEmailTemplate };
+  const resetPasswordTemplate = (resetUrl, userName) => {
+    return `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <h2 style="color: #333; text-align: center;">Reset Your Password</h2>
+        <p style="color: #555; font-size: 16px;">Hello ${userName},</p>
+        <p style="color: #555; font-size: 16px;">We received a request to reset your password for your Servify account. If you didn't make this request, you can safely ignore this email.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">Reset Password</a>
+        </div>
+        <p style="color: #555; font-size: 14px;">Or copy and paste this link into your browser:</p>
+        <p style="color: #0066cc; font-size: 14px; word-break: break-all;">${resetUrl}</p>
+        <p style="color: #999; font-size: 12px; margin-top: 30px; text-align: center;">This link will expire in 15 minutes.</p>
+      </div>
+    `;
+  };
+
+  module.exports = { verifyEmailTemplate, resetPasswordTemplate };
