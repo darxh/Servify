@@ -4,6 +4,9 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
 
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
+
 const testRoutes = require("./routes/testRoutes");
 const authRoutes = require("./routes/authRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -19,6 +22,16 @@ const PORT = process.env.PORT || 8080;
 //middlewares
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(helmet());
+// app.use(helmet({
+//   crossOriginResourcePolicy: { policy: "cross-origin" }
+// }));
+// app.use(mongoSanitize());
+// app.use(mongoSanitize({
+//   allowDots: true,
+//   replaceWith: '_',
+// }));
 
 // Server/server.js
 const corsOptions = {
@@ -40,7 +53,7 @@ app.use("/api/v1/services", serviceRoutes);
 app.use("/api/v1/bookings", bookingRoutes);
 app.use("/api/v1/reviews", reviewRoutes);
 
-app.use("/", testRoutes);
+// app.use("/", testRoutes);
 
 app.use((err, req, res, next) => {
   console.log("--------------------------------");
