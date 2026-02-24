@@ -28,6 +28,14 @@ The platform features robust role-based access control, real-time booking manage
 - **Email Verification** - Account verification via email using Nodemailer
 - **Password Security** - Bcrypt hashing for password protection
 - **Payment Ready** - Architecture ready for payment gateway integration
+- **Password Hashing:** Bcrypt with salt rounds for secure password storage
+<!-- - **JWT Tokens:** Separate access (15min) and refresh (7 days) tokens -->
+- **HttpOnly Cookies:** Refresh tokens stored in HttpOnly cookies to prevent XSS
+- **CORS Protection:** Configured CORS to allow only trusted origins
+- **Input Validation:** Zod schemas validate all user inputs
+- **Helmet.js:** Implemented to set secure HTTP headers and protect against common web vulnerabilities.
+- **Rate Limiting:** Custom API and Authentication rate limiters to prevent brute-force attacks and API abuse.
+- **MongoDB Injection Prevention:** Utilizes `express-mongo-sanitize` to filter prohibited characters.
 
 ---
 
